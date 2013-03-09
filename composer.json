@@ -1,0 +1,26 @@
+{
+    "name": "intervention/imagecache",
+    "description": "Caching extension for the Intervention Image Class",
+    "homepage": "https://github.com/Intervention/imagecache",
+    "keywords": ["image", "gd", "laravel", "cache"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Oliver Vogel",
+            "email": "oliver@olivervogel.net",
+            "homepage": "http://olivervogel.net/"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0",
+        "intervention/image": "1.2.x",
+        "illuminate/support": "4.0.x",
+        "illuminate/cache": "4.0.x"
+    },
+    "autoload": {
+        "psr-0": {
+            "Intervention\\Image": "src/"
+        }
+    },
+    "minimum-stability": "dev"
+}
