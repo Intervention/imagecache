@@ -118,6 +118,16 @@ class ImageCacheTest extends PHPUnit_Framework_Testcase
         $this->assertEquals($image->height, 200);
         $this->assertEquals($image->dirname, null);
         $this->assertEquals($image->basename, null);
+
+        $image = ImageCache::canvas(800, 600, 'b53717')->resize(300, 200)->process();
+        $this->assertInstanceOf('Intervention\Image\Image', $image);
+        $this->assertInternalType('int', $image->width);
+        $this->assertInternalType('int', $image->height);
+        $this->assertEquals($image->width, 300);
+        $this->assertEquals($image->height, 200);
+        $this->assertEquals($image->dirname, null);
+        $this->assertEquals($image->basename, null);
+        $this->assertEquals($image->pickColor(10, 10, 'hex'), '#b53717');
     }
 
     public function testGetImageFromCache()

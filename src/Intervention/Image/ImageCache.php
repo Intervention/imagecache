@@ -86,12 +86,13 @@ class ImageCache
      * 
      * @param  int $width
      * @param  int $height
+     * @param  int $bgcolor
      * @return ImageCache
      */
-    public static function canvas($width, $height)
+    public static function canvas($width, $height, $bgcolor = null)
     {
         $image = new ImageCache;
-        $image->registerCall('canvas', array($width, $height));
+        $image->registerCall('canvas', array($width, $height, $bgcolor));
 
         return $image;
     }
