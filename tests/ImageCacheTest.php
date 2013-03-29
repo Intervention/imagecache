@@ -34,6 +34,22 @@ class ImageCacheTest extends PHPUnit_Framework_Testcase
         $this->assertInstanceOf('Illuminate\Cache\CacheManager', $img->cache);
     }
 
+    public function testConstructorWithInjection()
+    {
+        // add new default cache
+        $cache =  new \Illuminate\Cache\CacheManager(array(
+            'config' => array(
+                    'cache.driver' => 'file',
+                    'cache.path' => __DIR__.'/mycache',
+                    'cache.files' => new \Illuminate\Filesystem\Filesystem
+                )
+        ));
+
+        $img = new ImageCache($cache);
+        $this->assertInstanceOf('Intervention\Image\ImageCache', $img);
+        $this->assertInstanceOf('Illuminate\Cache\CacheManager', $img->cache);
+    }
+
     public function testMagicMethodCalls()
     {
         $img = new ImageCache;

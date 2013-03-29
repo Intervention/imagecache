@@ -44,26 +44,33 @@ class ImageCache
     /**
      * Create a new instance
      */
-    public function __construct()
+    public function __construct(\Illuminate\Cache\CacheManager $cache = null)
     {
-        // get laravel app
-        $app = function_exists('app') ? app() : null;
+        if (is_null($cache)) {
+            
+            // get laravel app
+            $app = function_exists('app') ? app() : null;
 
-        // if laravel app cache exists
-        if (is_a($app, 'Illuminate\Foundation\Application')) {
-            $cache = $app->make('cache');
-        }
+            // if laravel app cache exists
+            if (is_a($app, 'Illuminate\Foundation\Application')) {
+                $cache = $app->make('cache');
+            }
 
-        if (is_a($cache, 'Illuminate\Cache\CacheManager')) {
-            // add laravel cache
-            $this->cache = $cache;
+            if (is_a($cache, 'Illuminate\Cache\CacheManager')) {
+                // add laravel cache
+                $this->cache = $cache;
+            } else {
+                // add new default cache
+                $config = array();
+                $config['config']['cache.driver'] = 'file';
+                $config['config']['cache.path'] = __DIR__.'/../../../storage/cache';
+                $config['files'] = new \Illuminate\Filesystem\Filesystem;
+                $this->cache =  new \Illuminate\Cache\CacheManager($config);
+            }
+
         } else {
-            // add new default cache
-            $config = array();
-            $config['config']['cache.driver'] = 'file';
-            $config['config']['cache.path'] = __DIR__.'/../../../storage/cache';
-            $config['files'] = new \Illuminate\Filesystem\Filesystem;
-            $this->cache =  new \Illuminate\Cache\CacheManager($config);
+            
+            $this->cache = $cache;
         }
     }
 
