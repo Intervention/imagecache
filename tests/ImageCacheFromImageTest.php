@@ -60,4 +60,37 @@ class ImageCacheFromImageTest extends PHPUnit_Framework_Testcase
         $this->assertEquals($img->width, 320);
         $this->assertEquals($img->height, 200);
     }
+
+    public function testStaticCallWithCallbackUsePath()
+    {
+        $path = 'public/test.jpg';
+
+        $img = Image::cache(function($image) use ($path) {
+            return $image->make($path);
+        }, 10, true);
+
+        $this->assertInstanceOf('Intervention\Image\Image', $img);
+    }
+
+    public function testStaticCallWithCallbackUseResource()
+    {
+        $resource = imagecreatefromjpeg('public/test.jpg');
+
+        $img = Image::cache(function($image) use ($resource) {
+            return $image->make($resource);
+        }, 10, true);
+
+        $this->assertInstanceOf('Intervention\Image\Image', $img);
+    }
+
+    public function testStaticCallWithCallbackUseBinary()
+    {
+        $data = file_get_contents('public/test.jpg');
+
+        $img = Image::cache(function($image) use ($data) {
+            return $image->make($data);
+        }, 10, true);
+
+        $this->assertInstanceOf('Intervention\Image\Image', $img);
+    }
 }

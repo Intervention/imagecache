@@ -84,10 +84,6 @@ class ImageCacheTest extends PHPUnit_Framework_Testcase
         $img->open('public/test.jpg');
         $img->resize(300, 200);
         $this->assertEquals($img->checksum(), $sum);
-
-        // check integritiy of checksum with static call (must be same as above)
-        $img = ImageCache::make('public/test.jpg')->resize(300, 200);
-        $this->assertEquals($img->checksum(), $sum);
     }
 
     public function testProcess()

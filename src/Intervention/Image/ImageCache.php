@@ -84,7 +84,7 @@ class ImageCache
     public static function make($path)
     {
         $image = new ImageCache;
-        $image->registerCall('open', array($path));
+        $image->registerCall('make', array($path));
 
         return $image;
     }
