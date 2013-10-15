@@ -44,7 +44,7 @@ class ImageCache
     /**
      * Create a new instance
      */
-    public function __construct(\Illuminate\Cache\CacheManager $cache = null)
+    public function __construct(\Illuminate\Cache\Repository $cache = null)
     {
         if (is_null($cache)) {
             
@@ -56,7 +56,7 @@ class ImageCache
                 $cache = $app->make('cache');
             }
 
-            if (is_a($cache, 'Illuminate\Cache\CacheManager')) {
+            if (is_a($cache, 'Illuminate\Cache\Repository')) {
                 // add laravel cache
                 $this->cache = $cache;
             } else {
@@ -65,7 +65,8 @@ class ImageCache
                 $config['config']['cache.driver'] = 'file';
                 $config['config']['cache.path'] = __DIR__.'/../../../storage/cache';
                 $config['files'] = new \Illuminate\Filesystem\Filesystem;
-                $this->cache =  new \Illuminate\Cache\CacheManager($config);
+                $storage = new \Illuminate\Cache\FileStore($config['files'], $config['config']['cache.path']);
+                $this->cache = new \Illuminate\Cache\Repository($storage);
             }
 
         } else {

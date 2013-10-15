@@ -6,17 +6,14 @@ class ImageCacheTest extends PHPUnit_Framework_Testcase
 {
     public function emptyCacheDirectory()
     {
-        $files = glob('storage/cache/*');
+        $files = new \Illuminate\Filesystem\Filesystem;
 
-        foreach ($files as $file) {
-
-            if (is_file($file)) {
-
-                unlink($file);
-            }
+        foreach ($files->directories('storage/cache') as $directory)
+        {
+            $files->deleteDirectory($directory);
         }
     }
-
+    
     public function tearDown()
     {
         $this->emptyCacheDirectory();
@@ -31,23 +28,18 @@ class ImageCacheTest extends PHPUnit_Framework_Testcase
     public function testCacheIsAvailable()
     {
         $img = new ImageCache;
-        $this->assertInstanceOf('Illuminate\Cache\CacheManager', $img->cache);
+        $this->assertInstanceOf('Illuminate\Cache\Repository', $img->cache);
     }
 
     public function testConstructorWithInjection()
     {
         // add new default cache
-        $cache =  new \Illuminate\Cache\CacheManager(array(
-            'config' => array(
-                    'cache.driver' => 'file',
-                    'cache.path' => __DIR__.'/mycache',
-                    'cache.files' => new \Illuminate\Filesystem\Filesystem
-                )
-        ));
+        $storage = new \Illuminate\Cache\FileStore(new \Illuminate\Filesystem\Filesystem, __DIR__.'/mycache');
+        $cache = new \Illuminate\Cache\Repository($storage);
 
         $img = new ImageCache($cache);
         $this->assertInstanceOf('Intervention\Image\ImageCache', $img);
-        $this->assertInstanceOf('Illuminate\Cache\CacheManager', $img->cache);
+        $this->assertInstanceOf('Illuminate\Cache\Repository', $img->cache);
     }
 
     public function testMagicMethodCalls()

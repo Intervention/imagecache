@@ -11,14 +11,11 @@ class ImageCacheFromImageTest extends PHPUnit_Framework_Testcase
 
     public function emptyCacheDirectory()
     {
-        $files = glob('storage/cache/*');
+        $files = new \Illuminate\Filesystem\Filesystem;
 
-        foreach ($files as $file) {
-
-            if (is_file($file)) {
-
-                unlink($file);
-            }
+        foreach ($files->directories('storage/cache') as $directory)
+        {
+            $files->deleteDirectory($directory);
         }
     }
 
