@@ -44,7 +44,7 @@ class ImageCache
     /**
      * Create a new instance
      */
-    public function __construct(\Illuminate\Cache\CacheManager $cache = null)
+    public function __construct(\Illuminate\Cache\Repository $cache = null)
     {
         if (is_null($cache)) {
             
@@ -57,8 +57,10 @@ class ImageCache
             }
 
             if (is_a($cache, 'Illuminate\Cache\CacheManager')) {
+
                 // add laravel cache
                 $this->cache = $cache;
+
             } else {
                 // add new default cache
                 $config = array();
@@ -223,7 +225,7 @@ class ImageCache
             // transform into image-object
             if ($returnObj) {
                 $image = Image::raw($cachedImageData);
-                $image->cached = true;
+                $image->cachekey = $key;
                 return $image;
             }
         
