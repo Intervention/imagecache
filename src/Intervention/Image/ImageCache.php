@@ -224,7 +224,7 @@ class ImageCache
 
             // transform into image-object
             if ($returnObj) {
-                $image = Image::raw($cachedImageData);
+                $image = new CachedImage($cachedImageData);
                 $image->cachekey = $key;
                 return $image;
             }

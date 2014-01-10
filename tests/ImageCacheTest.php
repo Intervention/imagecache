@@ -144,13 +144,11 @@ class ImageCacheTest extends PHPUnit_Framework_Testcase
 
         // call get method (must return image from cache)
         $image = ImageCache::make('public/test.jpg')->resize(300, 200)->get(5, true);
-        $this->assertInstanceOf('Intervention\Image\Image', $image);
         $this->assertInternalType('int', $image->width);
         $this->assertInternalType('int', $image->height);
         $this->assertEquals($image->width, 300);
         $this->assertEquals($image->height, 200);
-        $this->assertInternalType('string', $image->cachekey);
-
+        $this->assertEquals(get_class($image), 'Intervention\Image\CachedImage');
     }
 
     public function testGetImageNotFromCache()
@@ -160,11 +158,10 @@ class ImageCacheTest extends PHPUnit_Framework_Testcase
 
         // call get method (must return image directly)
         $image = ImageCache::make('public/test.jpg')->resize(300, 200)->get(5, true);
-        $this->assertInstanceOf('Intervention\Image\Image', $image);
         $this->assertInternalType('int', $image->width);
         $this->assertInternalType('int', $image->height);
         $this->assertEquals($image->width, 300);
         $this->assertEquals($image->height, 200);
-        $this->assertEquals($image->cachekey, null);
+        $this->assertEquals(get_class($image), 'Intervention\Image\Image');
     }
 }
