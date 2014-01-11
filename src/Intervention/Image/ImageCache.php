@@ -186,17 +186,20 @@ class ImageCache
     /**
      * Process all saved image calls on Image object
      * 
-     * @return Intervention\Image\Image
+     * @return Intervention\Image\CachedImage
      */
     public function process()
     {
         // create image to process calls on
-        $this->image = new Image;
+        $this->image = new CachedImage;
 
         // process calls on image
         foreach ($this->getCalls() as $call) {
             $this->processCall($call);
         }
+
+        // append checksum to image
+        $this->image->cachekey = $this->checksum();
 
         $this->clearCalls();
 
@@ -207,7 +210,8 @@ class ImageCache
      * Get image either from cache or directly processed
      * and save image in cache if it's not saved yet
      * 
-     * @param  int $lifetime
+     * @param  int  $lifetime
+     * @param  bool $returnObj
      * @return mixed
      */
     public function get($lifetime = null, $returnObj = false)

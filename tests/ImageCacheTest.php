@@ -149,6 +149,9 @@ class ImageCacheTest extends PHPUnit_Framework_Testcase
         $this->assertEquals($image->width, 300);
         $this->assertEquals($image->height, 200);
         $this->assertEquals(get_class($image), 'Intervention\Image\CachedImage');
+        // encoded is only set if image is processed by GD, if from cache it is
+        // not processed so it should be null
+        $this->assertEquals(is_null($image->encoded), true);
     }
 
     public function testGetImageNotFromCache()
@@ -162,6 +165,10 @@ class ImageCacheTest extends PHPUnit_Framework_Testcase
         $this->assertInternalType('int', $image->height);
         $this->assertEquals($image->width, 300);
         $this->assertEquals($image->height, 200);
-        $this->assertEquals(get_class($image), 'Intervention\Image\Image');
+        $this->assertEquals(get_class($image), 'Intervention\Image\CachedImage');
+        // encoded is only set if image is processed by GD, image should not
+        // come from cache so encoded should not be null
+        $this->assertEquals(is_null($image->encoded), false);
+        
     }
 }
