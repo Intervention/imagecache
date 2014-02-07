@@ -78,36 +78,6 @@ class ImageCache
     }
 
     /**
-     * Static call for creating an image from path
-     * 
-     * @param  string $path
-     * @return ImageCache
-     */
-    public static function make($path)
-    {
-        $image = new ImageCache;
-        $image->registerCall('make', array($path));
-
-        return $image;
-    }
-
-    /**
-     * Static call for creating empty image
-     * 
-     * @param  int $width
-     * @param  int $height
-     * @param  int $bgcolor
-     * @return ImageCache
-     */
-    public static function canvas($width, $height, $bgcolor = null)
-    {
-        $image = new ImageCache;
-        $image->registerCall('canvas', array($width, $height, $bgcolor));
-
-        return $image;
-    }
-
-    /**
      * Magic method to capture action calls
      *
      * @param  String $name

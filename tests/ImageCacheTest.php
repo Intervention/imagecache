@@ -105,7 +105,9 @@ class ImageCacheTest extends PHPUnit_Framework_Testcase
 
     public function testStaticCalls()
     {
-        $image = ImageCache::make('public/test.jpg')->resize(300, 200)->process();
+        $imagecache = new ImageCache;
+
+        $image = $imagecache->make('public/test.jpg')->resize(300, 200)->process();
         $this->assertInstanceOf('Intervention\Image\Image', $image);
         $this->assertInternalType('int', $image->width);
         $this->assertInternalType('int', $image->height);
@@ -114,7 +116,7 @@ class ImageCacheTest extends PHPUnit_Framework_Testcase
         $this->assertEquals($image->dirname, 'public');
         $this->assertEquals($image->basename, 'test.jpg');
 
-        $image = ImageCache::canvas(800, 600)->resize(300, 200)->process();
+        $image = $imagecache->canvas(800, 600)->resize(300, 200)->process();
         $this->assertInstanceOf('Intervention\Image\Image', $image);
         $this->assertInternalType('int', $image->width);
         $this->assertInternalType('int', $image->height);
@@ -123,7 +125,7 @@ class ImageCacheTest extends PHPUnit_Framework_Testcase
         $this->assertEquals($image->dirname, null);
         $this->assertEquals($image->basename, null);
 
-        $image = ImageCache::canvas(800, 600, 'b53717')->resize(300, 200)->process();
+        $image = $imagecache->canvas(800, 600, 'b53717')->resize(300, 200)->process();
         $this->assertInstanceOf('Intervention\Image\Image', $image);
         $this->assertInternalType('int', $image->width);
         $this->assertInternalType('int', $image->height);
@@ -136,14 +138,16 @@ class ImageCacheTest extends PHPUnit_Framework_Testcase
 
     public function testGetImageFromCache()
     {
+        $imagecache = new ImageCache;
+
         // put image into cache
-        $image = ImageCache::make('public/test.jpg')->resize(300, 200);
+        $image = $imagecache->make('public/test.jpg')->resize(300, 200);
         $key = $image->checksum();
         $value = (string) $image->process();
         $image->cache->put($key, $value, 5);
 
         // call get method (must return image from cache)
-        $image = ImageCache::make('public/test.jpg')->resize(300, 200)->get(5, true);
+        $image = $imagecache->make('public/test.jpg')->resize(300, 200)->get(5, true);
         $this->assertInternalType('int', $image->width);
         $this->assertInternalType('int', $image->height);
         $this->assertEquals($image->width, 300);
@@ -156,11 +160,13 @@ class ImageCacheTest extends PHPUnit_Framework_Testcase
 
     public function testGetImageNotFromCache()
     {
+        $imagecache = new ImageCache;
+        
         // empty cache directory
         $this->emptyCacheDirectory();
 
         // call get method (must return image directly)
-        $image = ImageCache::make('public/test.jpg')->resize(300, 200)->get(5, true);
+        $image = $imagecache->make('public/test.jpg')->resize(300, 200)->get(5, true);
         $this->assertInternalType('int', $image->width);
         $this->assertInternalType('int', $image->height);
         $this->assertEquals($image->width, 300);
