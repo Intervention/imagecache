@@ -3,6 +3,7 @@
 namespace Intervention\Image;
 
 use Exception;
+use Jeremeamia\SuperClosure\SerializableClosure;
 
 class ImageCache
 {
@@ -98,7 +99,7 @@ class ImageCache
      */
     public function checksum()
     {
-        return md5(serialize($this->getCalls()));
+        return md5(serialize($this->getSanitizedCalls()));
     }
 
     /**
@@ -131,6 +132,26 @@ class ImageCache
     private function getCalls()
     {
         return count($this->calls) ? $this->calls : array();
+    }
+
+    /**
+     * Replace Closures in arguments with SerializableClosure
+     *
+     * @return array
+     */
+    private function getSanitizedCalls()
+    {
+        $calls = $this->getCalls();
+
+        foreach ($calls as $i => $call) {
+            foreach ($call['arguments'] as $j => $argument) {
+                if (is_a($argument, 'Closure')) {
+                    $calls[$i]['arguments'][$j] = new SerializableClosure($argument);
+                }
+            }
+        }
+
+        return $calls;
     }
 
     /**
