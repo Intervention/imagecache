@@ -189,8 +189,10 @@ class ImageCache
             $this->processCall($call);
         }
 
-        // append checksum to image
-        $this->image->cachekey = $this->checksum();
+        // append checksum to image if image is not already encoded
+        if ($this->image instanceof CachedImage) {
+            $this->image->cachekey = $this->checksum();
+        }
 
         $this->clearCalls();
 

@@ -200,4 +200,15 @@ class ImageCacheTest extends PHPUnit_Framework_Testcase
         $this->assertEquals(is_null($image->encoded), false);
         
     }
+
+    public function testGetAlreadyEncodedImageFromCache()
+    {
+        $imagecache = new ImageCache;
+        
+        // empty cache directory
+        $this->emptyCacheDirectory();
+
+        $image = $imagecache->make('public/test.jpg')->encode('jpg', 5)->get(5, false);
+        $this->assertInternalType('string', $image);
+    }
 }
