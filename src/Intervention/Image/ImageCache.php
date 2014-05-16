@@ -4,6 +4,7 @@ namespace Intervention\Image;
 
 use Exception;
 use Jeremeamia\SuperClosure\SerializableClosure;
+use \Illuminate\Cache\Repository as Cache;
 
 class ImageCache
 {
@@ -29,6 +30,13 @@ class ImageCache
     public $image;
 
     /**
+     * Intervention Image Manager
+     *
+     * @var Intervention\Image\ImageManager
+     */
+    public $manager;
+
+    /**
      * Illuminate Cache Manager
      *
      * @var Illuminate\Cache\CacheManager
@@ -36,17 +44,12 @@ class ImageCache
     public $cache;
 
     /**
-     * List of calls that will be processed statically
-     * 
-     * @var array
-     */
-    private $reserved_static_calls = array('make', 'canvas', 'raw');
-
-    /**
      * Create a new instance
      */
-    public function __construct(\Illuminate\Cache\Repository $cache = null)
+    public function __construct(ImageManager $manager = null, Cache $cache = null)
     {
+        $this->manager = $manager ? $manager : new ImageManager;
+        
         if (is_null($cache)) {
             
             // get laravel app
@@ -162,37 +165,26 @@ class ImageCache
      */
     private function processCall($call)
     {
-        if (method_exists($this->image, $call['name'])) {
-
-            if (in_array($call['name'], $this->reserved_static_calls)) {
-                // static call
-                $this->image = forward_static_call_array(array($this->image, $call['name']), $call['arguments']);
-            } else {
-                // regular call
-                $this->image = call_user_func_array(array($this->image, $call['name']), $call['arguments']);
-            }
-        }
+        $this->image = call_user_func_array(array($this->image, $call['name']), $call['arguments']);
     }
 
     /**
      * Process all saved image calls on Image object
      * 
-     * @return Intervention\Image\CachedImage
+     * @return Intervention\Image\Image
      */
     public function process()
     {
-        // create image to process calls on
-        $this->image = new CachedImage;
+        // first call on manager
+        $this->image = $this->manager;
 
         // process calls on image
         foreach ($this->getCalls() as $call) {
             $this->processCall($call);
         }
 
-        // append checksum to image if image is not already encoded
-        if ($this->image instanceof CachedImage) {
-            $this->image->cachekey = $this->checksum();
-        }
+        // append checksum to image
+        $this->image->cachekey = $this->checksum();
 
         $this->clearCalls();
 
@@ -221,7 +213,7 @@ class ImageCache
 
             // transform into image-object
             if ($returnObj) {
-                $image = new CachedImage($cachedImageData);
+                $image = $this->manager->make($cachedImageData);
                 $image->cachekey = $key;
                 return $image;
             }
@@ -232,7 +224,7 @@ class ImageCache
         } else {
 
             // process image data
-            $image = $this->process();
+            $image = $this->process()->encode();
 
             // save to cache...
             $this->cache->put($key, (string) $image, $lifetime);

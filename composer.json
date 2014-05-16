@@ -2,7 +2,7 @@
     "name": "intervention/imagecache",
     "description": "Caching extension for the Intervention Image Class",
     "homepage": "http://image.intervention.io",
-    "keywords": ["image", "gd", "laravel", "cache"],
+    "keywords": ["image", "gd", "imagick", "laravel", "cache"],
     "license": "MIT",
     "authors": [
         {
@@ -18,6 +18,10 @@
         "illuminate/cache": "4.*",
         "illuminate/filesystem": "4.*",
         "jeremeamia/SuperClosure": "1.*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "3.*",
+        "mockery/mockery": "0.9.*"
     },
     "autoload": {
         "psr-0": {

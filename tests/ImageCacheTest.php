@@ -17,28 +17,26 @@ class ImageCacheTest extends PHPUnit_Framework_Testcase
     public function tearDown()
     {
         $this->emptyCacheDirectory();
+        Mockery::close();
     }
 
     public function testConstructor()
     {
         $img = new ImageCache;
         $this->assertInstanceOf('Intervention\Image\ImageCache', $img);
-    }
-
-    public function testCacheIsAvailable()
-    {
-        $img = new ImageCache;
+        $this->assertInstanceOf('Intervention\Image\ImageManager', $img->manager);
         $this->assertInstanceOf('Illuminate\Cache\Repository', $img->cache);
     }
 
     public function testConstructorWithInjection()
     {
         // add new default cache
-        $storage = new \Illuminate\Cache\FileStore(new \Illuminate\Filesystem\Filesystem, __DIR__.'/mycache');
-        $cache = new \Illuminate\Cache\Repository($storage);
+        $manager = Mockery::mock('\Intervention\Image\ImageManager');
+        $cache = Mockery::mock('\Illuminate\Cache\Repository');
 
-        $img = new ImageCache($cache);
+        $img = new ImageCache($manager, $cache);
         $this->assertInstanceOf('Intervention\Image\ImageCache', $img);
+        $this->assertInstanceOf('Intervention\Image\ImageManager', $img->manager);
         $this->assertInstanceOf('Illuminate\Cache\Repository', $img->cache);
     }
 
@@ -76,14 +74,14 @@ class ImageCacheTest extends PHPUnit_Framework_Testcase
         // checksum of empty image
         $sum = '40cd750bba9870f18aada2478b24840a';
         $img = new ImageCache;
-        $this->assertEquals($img->checksum(), $sum);
+        $this->assertEquals($sum, $img->checksum());
 
         // checksum of test image resized to 300x200
-        $sum = '243c7c0dd9e7328697dfc7d874bb9103';
+        $sum = '792dcbdcefdd977a099b6fdd06c8ab57';
         $img = new ImageCache;
-        $img->open('public/test.jpg');
+        $img->open('foo/bar.jpg');
         $img->resize(300, 200);
-        $this->assertEquals($img->checksum(), $sum);
+        $this->assertEquals($sum, $img->checksum());
     }
 
     public function testChecksumWithClosure()
@@ -111,104 +109,111 @@ class ImageCacheTest extends PHPUnit_Framework_Testcase
 
     public function testProcess()
     {
-        $img = new ImageCache;
-        $img->open('public/test.jpg');
+        $image = Mockery::mock('\Intervention\Image\Image');
+        $image->shouldReceive('resize')->with(300, 200)->once()->andReturn($image);
+        $image->shouldReceive('blur')->with(2)->once()->andReturn($image);
+        $manager = Mockery::mock('\Intervention\Image\ImageManager');
+        $manager->shouldReceive('make')->with('foo/bar.jpg')->once()->andReturn($image);
+        $cache = Mockery::mock('\Illuminate\Cache\Repository');
+
+        $img = new ImageCache($manager, $cache);
+        $img->make('foo/bar.jpg');
         $img->resize(300, 200);
+        $img->blur(2);
         $result = $img->process();
 
         $this->assertEquals(count($img->calls), 0);
-        $this->assertInstanceOf('Intervention\Image\Image', $result);
-        $this->assertInternalType('int', $result->width);
-        $this->assertInternalType('int', $result->height);
-        $this->assertEquals($result->width, 300);
-        $this->assertEquals($result->height, 200);
-        $this->assertEquals($result->dirname, 'public');
-        $this->assertEquals($result->basename, 'test.jpg');
-    }
-
-    public function testStaticCalls()
-    {
-        $imagecache = new ImageCache;
-
-        $image = $imagecache->make('public/test.jpg')->resize(300, 200)->process();
-        $this->assertInstanceOf('Intervention\Image\Image', $image);
-        $this->assertInternalType('int', $image->width);
-        $this->assertInternalType('int', $image->height);
-        $this->assertEquals($image->width, 300);
-        $this->assertEquals($image->height, 200);
-        $this->assertEquals($image->dirname, 'public');
-        $this->assertEquals($image->basename, 'test.jpg');
-
-        $image = $imagecache->canvas(800, 600)->resize(300, 200)->process();
-        $this->assertInstanceOf('Intervention\Image\Image', $image);
-        $this->assertInternalType('int', $image->width);
-        $this->assertInternalType('int', $image->height);
-        $this->assertEquals($image->width, 300);
-        $this->assertEquals($image->height, 200);
-        $this->assertEquals($image->dirname, null);
-        $this->assertEquals($image->basename, null);
-
-        $image = $imagecache->canvas(800, 600, 'b53717')->resize(300, 200)->process();
-        $this->assertInstanceOf('Intervention\Image\Image', $image);
-        $this->assertInternalType('int', $image->width);
-        $this->assertInternalType('int', $image->height);
-        $this->assertEquals($image->width, 300);
-        $this->assertEquals($image->height, 200);
-        $this->assertEquals($image->dirname, null);
-        $this->assertEquals($image->basename, null);
-        $this->assertEquals($image->pickColor(10, 10, 'hex'), '#b53717');
+        $this->assertInstanceOf('Intervention\Image\Image', $result);        
+        $this->assertEquals('9538f2e38b3f6878936bfea3b2de13b3', $result->cachekey);
     }
 
     public function testGetImageFromCache()
     {
-        $imagecache = new ImageCache;
+        $lifetime = 12;
+        $checksum = 'c6b782cdfd704596bf7cf8ee471b12f7';
+        $imagedata = 'mocked image data';
 
-        // put image into cache
-        $image = $imagecache->make('public/test.jpg')->resize(300, 200);
-        $key = $image->checksum();
-        $value = (string) $image->process();
-        $image->cache->put($key, $value, 5);
+        $manager = Mockery::mock('\Intervention\Image\ImageManager');
+        $cache = Mockery::mock('\Illuminate\Cache\Repository');
+        $cache->shouldReceive('get')->with($checksum)->once()->andReturn($imagedata);
+        $img = new ImageCache($manager, $cache);
+        $img->make('foo/bar.jpg');
+        $img->resize(100, 150);
+        $result = $img->get($lifetime);
 
-        // call get method (must return image from cache)
-        $image = $imagecache->make('public/test.jpg')->resize(300, 200)->get(5, true);
-        $this->assertInternalType('int', $image->width);
-        $this->assertInternalType('int', $image->height);
-        $this->assertEquals($image->width, 300);
-        $this->assertEquals($image->height, 200);
-        $this->assertEquals(get_class($image), 'Intervention\Image\CachedImage');
-        // encoded is only set if image is processed by GD, if from cache it is
-        // not processed so it should be null
-        $this->assertEquals(is_null($image->encoded), true);
+        $this->assertEquals($imagedata, $result);
+    }
+
+    public function testGetImageFromCacheAsObject()
+    {
+        $lifetime = 12;
+        $checksum = 'c6b782cdfd704596bf7cf8ee471b12f7';
+        $imagedata = 'mocked image data';
+
+        $image = Mockery::mock('\Intervention\Image\Image');
+
+        $manager = Mockery::mock('\Intervention\Image\ImageManager');
+        $manager->shouldReceive('make')->with($imagedata)->once()->andReturn($image);
+        $cache = Mockery::mock('\Illuminate\Cache\Repository');
+        $cache->shouldReceive('get')->with($checksum)->once()->andReturn($imagedata);
+        $img = new ImageCache($manager, $cache);
+        $img->make('foo/bar.jpg');
+        $img->resize(100, 150);
+        $result = $img->get($lifetime, true);
+
+        $this->assertInstanceOf('Intervention\Image\Image', $result);
     }
 
     public function testGetImageNotFromCache()
     {
-        $imagecache = new ImageCache;
-        
-        // empty cache directory
-        $this->emptyCacheDirectory();
+        $lifetime = 12;
+        $checksum = 'c6b782cdfd704596bf7cf8ee471b12f7';
+        $imagedata = 'mocked image data';
 
-        // call get method (must return image directly)
-        $image = $imagecache->make('public/test.jpg')->resize(300, 200)->get(5, true);
-        $this->assertInternalType('int', $image->width);
-        $this->assertInternalType('int', $image->height);
-        $this->assertEquals($image->width, 300);
-        $this->assertEquals($image->height, 200);
-        $this->assertEquals(get_class($image), 'Intervention\Image\CachedImage');
-        // encoded is only set if image is processed by GD, image should not
-        // come from cache so encoded should not be null
-        $this->assertEquals(is_null($image->encoded), false);
-        
+        $image = Mockery::mock('\Intervention\Image\Image');
+        $image->shouldReceive('resize')->with(100, 150)->once()->andReturn($image);
+        $image->shouldReceive('encode')->with()->once()->andReturn($imagedata);
+
+        $manager = Mockery::mock('\Intervention\Image\ImageManager');
+        $manager->shouldReceive('make')->with('foo/bar.jpg')->once()->andReturn($image);
+        $cache = Mockery::mock('\Illuminate\Cache\Repository');
+        $cache->shouldReceive('get')->with($checksum)->once()->andReturn(false);
+        $cache->shouldReceive('put')->with($checksum, $imagedata, $lifetime)->once()->andReturn(false);
+
+        $img = new ImageCache($manager, $cache);
+        $img->make('foo/bar.jpg');
+        $img->resize(100, 150);
+        $result = $img->get($lifetime);
+
+        $this->assertEquals($imagedata, $result);
+    }
+
+    public function testGetImageNotFromCacheAsObject()
+    {
+        $lifetime = 12;
+        $checksum = 'c6b782cdfd704596bf7cf8ee471b12f7';
+        $imagedata = 'mocked image data';
+
+        $image = Mockery::mock('\Intervention\Image\Image');
+        $image->shouldReceive('resize')->with(100, 150)->once()->andReturn($image);
+        $image->shouldReceive('encode')->with()->once()->andReturn($imagedata);
+
+        $manager = Mockery::mock('\Intervention\Image\ImageManager');
+        $manager->shouldReceive('make')->with('foo/bar.jpg')->once()->andReturn($image);
+        $cache = Mockery::mock('\Illuminate\Cache\Repository');
+        $cache->shouldReceive('get')->with($checksum)->once()->andReturn(false);
+        $cache->shouldReceive('put')->with($checksum, $imagedata, $lifetime)->once()->andReturn(false);
+
+        $img = new ImageCache($manager, $cache);
+        $img->make('foo/bar.jpg');
+        $img->resize(100, 150);
+        $result = $img->get($lifetime, true);
+
+        $this->assertEquals($imagedata, $result);
     }
 
     public function testGetAlreadyEncodedImageFromCache()
     {
-        $imagecache = new ImageCache;
-        
-        // empty cache directory
-        $this->emptyCacheDirectory();
-
-        $image = $imagecache->make('public/test.jpg')->encode('jpg', 5)->get(5, false);
-        $this->assertInternalType('string', $image);
+        # code...
     }
 }
