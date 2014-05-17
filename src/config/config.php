@@ -51,13 +51,13 @@ return array(
     'templates' => array(
 
         'small' => function($image) { 
-            return $image->grab(120, 90);
+            return $image->fit(120, 90);
         },
         'medium' => function($image) {
-            return $image->grab(240, 180);
+            return $image->fit(240, 180);
         },
         'large' => function($image) {
-            return $image->grab(480, 360);
+            return $image->fit(480, 360);
         }
 
     ),
