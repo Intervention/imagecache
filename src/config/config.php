@@ -26,7 +26,7 @@ return array(
     | The following paths will be searched for the image filename, submited 
     | by URI. 
     | 
-    | Define as mich directories as you like.
+    | Define as many directories as you like.
     |
     */
     
