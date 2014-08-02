@@ -66,12 +66,17 @@ class ImageCache
                 $this->cache = $cache;
 
             } else {
-                // add new default cache
-                $config = array();
-                $config['config']['cache.driver'] = 'file';
-                $config['config']['cache.path'] = __DIR__.'/../../../storage/cache';
-                $config['files'] = new \Illuminate\Filesystem\Filesystem;
-                $storage = new \Illuminate\Cache\FileStore($config['files'], $config['config']['cache.path']);
+                    
+                // define path in filesystem
+                if (isset($manager->config['cache']['path'])) {
+                    $path = $manager->config['cache']['path'];
+                } else {
+                    $path = __DIR__.'/../../../storage/cache';
+                }
+
+                // create new default cache
+                $filesystem = new \Illuminate\Filesystem\Filesystem;
+                $storage = new \Illuminate\Cache\FileStore($filesystem, $path);
                 $this->cache = new \Illuminate\Cache\Repository($storage);
             }
 
