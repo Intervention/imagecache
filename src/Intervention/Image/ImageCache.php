@@ -229,7 +229,10 @@ class ImageCache
         } else {
 
             // process image data
-            $image = $this->process()->encode();
+            $image = $this->process();
+
+            // encode image data only if image is not encoded yet
+            $image = $image->encoded ? $image->encoded : $image->encode();
 
             // save to cache...
             $this->cache->put($key, (string) $image, $lifetime);
