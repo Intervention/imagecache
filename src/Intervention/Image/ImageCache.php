@@ -95,6 +95,10 @@ class ImageCache
      */
     public function __call($name, $arguments)
     {
+        if($name == 'make'){
+            $arguments[] = filemtime($arguments[0]);
+        }
+        
         $this->registerCall($name, $arguments);
 
         return $this;
