@@ -2,7 +2,7 @@
 
 Intervention Image Cache extends the [Intervention Image Class](https://github.com/Intervention/image/) package to be capable of image caching functionality.
 
-The library uses the [Illuminate/Cache](https://github.com/illuminate/cache/) package and can be easily integrated into the [Laravel 4 Framework](https://github.com/laravel/framework/). Based on your Laravel cache configuration you are able to choose between Filesystem, Database, Memcached or Redis for the temporary buffer store.
+The library uses the [Illuminate/Cache](https://github.com/illuminate/cache/) package and can be easily integrated into the [Laravel Framework](https://laravel.com/). Based on your Laravel cache configuration you are able to choose between Filesystem, Database, Memcached or Redis for the temporary buffer store.
 
 The principle is simple. Every method call to the Intervention Image class is captured and checked by the caching interface. If this particular sequence of operations already have taken place, the data will be loaded directly from the cache instead of a resource-intensive GD operation.
 
@@ -12,7 +12,7 @@ You can install this Image class quickly and easily with Composer.
 
 Require the package via Composer in your `composer.json`.
 
-    "intervention/imagecache": "dev-master"
+    "intervention/imagecache": "2.*"
 
 Run Composer to install or update the new requirement.
 
@@ -20,9 +20,9 @@ Run Composer to install or update the new requirement.
 
 Now you are able to require the `vendor/autoload.php` file to PSR-0 autoload the library.
 
-### Laravel 4 Integration
+### Laravel Integration
 
-The Image Cache class supports Laravel 4 integration. Best practice to use the library in Laravel 4 is to add the ServiceProvider and Facade of the Intervention Image Class.
+The Image Cache class supports Laravel integration. Best practice to use the library in Laravel is to add the ServiceProvider and Facade of the Intervention Image Class.
 
 Open your Laravel config file `config/app.php` and add the following lines.
 
