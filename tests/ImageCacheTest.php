@@ -4,6 +4,12 @@ use Intervention\Image\ImageCache;
 
 class ImageCacheTest extends PHPUnit_Framework_Testcase
 {
+    public function tearDown()
+    {
+        $this->emptyCacheDirectory();
+        Mockery::close();
+    }
+
     public function emptyCacheDirectory()
     {
         $files = new \Illuminate\Filesystem\Filesystem;
@@ -12,12 +18,6 @@ class ImageCacheTest extends PHPUnit_Framework_Testcase
         {
             $files->deleteDirectory($directory);
         }
-    }
-    
-    public function tearDown()
-    {
-        $this->emptyCacheDirectory();
-        Mockery::close();
     }
 
     public function testConstructor()
@@ -72,14 +72,14 @@ class ImageCacheTest extends PHPUnit_Framework_Testcase
     public function testChecksum()
     {
         // checksum of empty image
-        $sum = '40cd750bba9870f18aada2478b24840a';
+        $sum = 'ad7b81dea42cf2ef7525c274471e3ce6';
         $img = new ImageCache;
         $this->assertEquals($sum, $img->checksum());
 
         // checksum of test image resized to 300x200
-        $sum = '792dcbdcefdd977a099b6fdd06c8ab57';
+        $sum = '9b3c716836cb438c4619eb0452740019';
         $img = new ImageCache;
-        $img->open('foo/bar.jpg');
+        $img->make('foo/bar.jpg');
         $img->resize(300, 200);
         $this->assertEquals($sum, $img->checksum());
     }
@@ -87,7 +87,7 @@ class ImageCacheTest extends PHPUnit_Framework_Testcase
     public function testChecksumWithClosure()
     {
         // closure must be serializable
-        $sum = '96cb89799900f6655c75b2b3a671ca38';
+        $sum = 'b87586a50f98a5bf404a8571e9db941d';
         $img = new ImageCache;
         $img->canvas(300, 200, 'fff');
         $img->text('foo', 0, 0, function($font) {
@@ -97,7 +97,7 @@ class ImageCacheTest extends PHPUnit_Framework_Testcase
         $this->assertEquals($img->checksum(), $sum);
 
         // checksum must differ, if values in closure change
-        $sum = '8ae197da869264c480c3093aa031fb20';
+        $sum = 'bdc29e647cfa9529a83a513a8e1e48f6';
         $img = new ImageCache;
         $img->canvas(300, 200, 'fff');
         $img->text('foo', 0, 0, function($font) {
@@ -105,6 +105,24 @@ class ImageCacheTest extends PHPUnit_Framework_Testcase
             $font->size(30);
         });
         $this->assertEquals($img->checksum(), $sum);
+    }
+
+    public function testChecksumWithProperty()
+    {
+        // checksum of test image resized to 300x200
+        $sum = '9b3c716836cb438c4619eb0452740019';
+        $img = new ImageCache;
+        $img->make('foo/bar.jpg');
+        $img->resize(300, 200);
+        $this->assertEquals($sum, $img->checksum());
+
+        // different checksum with property
+        $sum = '299243f98e2de9939ea59e5884ab1b8b';
+        $img = new ImageCache;
+        $img->setProperty('foo', 'bar');
+        $img->make('foo/bar.jpg');
+        $img->resize(300, 200);
+        $this->assertEquals($sum, $img->checksum());
     }
 
     public function testProcess()
@@ -124,13 +142,13 @@ class ImageCacheTest extends PHPUnit_Framework_Testcase
 
         $this->assertEquals(count($img->calls), 0);
         $this->assertInstanceOf('Intervention\Image\Image', $result);        
-        $this->assertEquals('9538f2e38b3f6878936bfea3b2de13b3', $result->cachekey);
+        $this->assertEquals('e795d413cf6598f49a8e773ce2e07589', $result->cachekey);
     }
 
     public function testGetImageFromCache()
     {
         $lifetime = 12;
-        $checksum = 'c6b782cdfd704596bf7cf8ee471b12f7';
+        $checksum = '2fff960136929390427f9409eac34c42';
         $imagedata = 'mocked image data';
 
         $manager = Mockery::mock('\Intervention\Image\ImageManager');
@@ -147,7 +165,7 @@ class ImageCacheTest extends PHPUnit_Framework_Testcase
     public function testGetImageFromCacheAsObject()
     {
         $lifetime = 12;
-        $checksum = 'c6b782cdfd704596bf7cf8ee471b12f7';
+        $checksum = '2fff960136929390427f9409eac34c42';
         $imagedata = 'mocked image data';
 
         $image = Mockery::mock('\Intervention\Image\Image');
@@ -167,7 +185,7 @@ class ImageCacheTest extends PHPUnit_Framework_Testcase
     public function testGetImageNotFromCache()
     {
         $lifetime = 12;
-        $checksum = 'c6b782cdfd704596bf7cf8ee471b12f7';
+        $checksum = '2fff960136929390427f9409eac34c42';
         $imagedata = 'mocked image data';
 
         $image = Mockery::mock('\Intervention\Image\Image');
@@ -191,7 +209,7 @@ class ImageCacheTest extends PHPUnit_Framework_Testcase
     public function testGetImageNotFromCacheAsObject()
     {
         $lifetime = 12;
-        $checksum = 'c6b782cdfd704596bf7cf8ee471b12f7';
+        $checksum = '2fff960136929390427f9409eac34c42';
         $imagedata = 'mocked image data';
 
         $image = Mockery::mock('\Intervention\Image\Image');
@@ -212,8 +230,33 @@ class ImageCacheTest extends PHPUnit_Framework_Testcase
         $this->assertEquals($imagedata, $result);
     }
 
-    public function testGetAlreadyEncodedImageFromCache()
+    public function testOriginalFileChanged()
     {
-        # code...
+        $filename = __DIR__.'/files/foo.bar';
+
+        // create tmp file
+        touch($filename);
+
+        // get original checksum
+        $img = new ImageCache;
+        $img->make($filename);
+        $img->resize(300, 200);
+        $checksum_original = $img->checksum();
+
+        // get modified checksum
+        clearstatcache();
+        $modified = touch($filename, 10);
+
+        // get modified checksum
+        $img = new ImageCache;
+        $img->make($filename);
+        $img->resize(300, 200);
+        $checksum_modified = $img->checksum();
+
+        // delete tmp file
+        unlink($filename);
+
+        $this->assertTrue($modified);
+        $this->assertNotEquals($checksum_original, $checksum_modified);
     }
 }

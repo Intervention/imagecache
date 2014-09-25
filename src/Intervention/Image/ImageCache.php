@@ -4,7 +4,7 @@ namespace Intervention\Image;
 
 use Exception;
 use Jeremeamia\SuperClosure\SerializableClosure;
-use \Illuminate\Cache\Repository as Cache;
+use Illuminate\Cache\Repository as Cache;
 
 class ImageCache
 {
@@ -21,6 +21,13 @@ class ImageCache
      * @var array
      */
     public $calls = array();
+
+    /**
+     * Additional properties included in checksum
+     *
+     * @var array
+     */
+    public $properties = array();
 
     /**
      * Processed Image
@@ -101,13 +108,49 @@ class ImageCache
     }
 
     /**
+     * Special make method to add modifed data to checksum
+     *
+     * @param  mixed $data
+     * @return Intervention\Image\ImageCache
+     */
+    public function make($data)
+    {
+        // include "modified" property for any files
+        if (is_file((string) $data)) {
+            $this->setProperty('modified', filemtime((string) $data));
+        }
+
+        // register make call
+        $this->__call('make', array($data));
+
+        return $this;
+    }
+
+    /**
+     * Set custom property to be included in checksum
+     *
+     * @param mixed $key
+     * @param mixed $value
+     * @return Intervention\Image\ImageCache
+     */
+    public function setProperty($key, $value)
+    {
+        $this->properties[$key] = $value;
+
+        return $this;
+    }
+
+    /**
      * Returns checksum of current image state
      * 
      * @return string
      */
     public function checksum()
     {
-        return md5(serialize($this->getSanitizedCalls()));
+        $properties = serialize($this->properties);
+        $calls = serialize($this->getSanitizedCalls());
+
+        return md5($properties.$calls);
     }
 
     /**
@@ -130,6 +173,16 @@ class ImageCache
     private function clearCalls()
     {
         $this->calls = array();
+    }
+
+    /**
+     * Clears all currently set properties
+     * 
+     * @return void
+     */
+    private function clearProperties()
+    {
+        $this->properties = array();
     }
 
     /**
@@ -191,7 +244,9 @@ class ImageCache
         // append checksum to image
         $this->image->cachekey = $this->checksum();
 
+        // clean-up
         $this->clearCalls();
+        $this->clearProperties();
 
         return $this->image;
     }
