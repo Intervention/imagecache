@@ -23,8 +23,8 @@
         "mockery/mockery": "0.9.*"
     },
     "autoload": {
-        "psr-0": {
-            "Intervention\\Image": "src/"
+        "psr-4": {
+            "Intervention\\Image\\": "src/Intervention/Image"
         }
     },
     "minimum-stability": "stable"
