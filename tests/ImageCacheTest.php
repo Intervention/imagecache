@@ -259,4 +259,11 @@ class ImageCacheTest extends PHPUnit_Framework_Testcase
         $this->assertTrue($modified);
         $this->assertNotEquals($checksum_original, $checksum_modified);
     }
+
+    public function testBinaryInput()
+    {
+        $data = file_get_contents(__DIR__.'/files/test.png');
+        $img = new ImageCache;
+        $img->make($data);
+    }
 }

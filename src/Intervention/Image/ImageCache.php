@@ -116,7 +116,7 @@ class ImageCache
     public function make($data)
     {
         // include "modified" property for any files
-        if (is_file((string) $data)) {
+        if ($this->isFile($data)) {
             $this->setProperty('modified', filemtime((string) $data));
         }
 
@@ -124,6 +124,19 @@ class ImageCache
         $this->__call('make', array($data));
 
         return $this;
+    }
+
+    /**
+     * Checks if given data is file, handles mixed input
+     *
+     * @param  mixed $value
+     * @return boolean
+     */
+    private function isFile($value)
+    {
+        $value = strval(str_replace("\0", "", $value));
+
+        return is_file($value);
     }
 
     /**
