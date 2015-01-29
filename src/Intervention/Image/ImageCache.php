@@ -3,7 +3,6 @@
 namespace Intervention\Image;
 
 use Exception;
-use Jeremeamia\SuperClosure\SerializableClosure;
 use Illuminate\Cache\Repository as Cache;
 
 class ImageCache
@@ -220,12 +219,29 @@ class ImageCache
         foreach ($calls as $i => $call) {
             foreach ($call['arguments'] as $j => $argument) {
                 if (is_a($argument, 'Closure')) {
-                    $calls[$i]['arguments'][$j] = new SerializableClosure($argument);
+                    $calls[$i]['arguments'][$j] = $this->buildSerializableClosure($argument);
                 }
             }
         }
 
         return $calls;
+    }
+
+    /**
+     * Build SerializableClosure from Closure
+     *
+     * @param  Closure $closure
+     * @return Jeremeamia\SuperClosure\SerializableClosure|SuperClosure\SerializableClosure
+     */
+    private function buildSerializableClosure(\Closure $closure)
+    {
+        switch (true) {
+            case class_exists('SuperClosure\\SerializableClosure'):
+                return new \SuperClosure\SerializableClosure($closure);
+            
+            default:
+                return new \Jeremeamia\SuperClosure\SerializableClosure($closure);
+        }
     }
 
     /**
