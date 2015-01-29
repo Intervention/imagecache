@@ -3,7 +3,7 @@
 namespace Intervention\Image;
 
 use Exception;
-use Jeremeamia\SuperClosure\SerializableClosure;
+use SuperClosure\SerializableClosure;
 use Illuminate\Cache\Repository as Cache;
 
 class ImageCache
