@@ -87,7 +87,7 @@ class ImageCacheTest extends PHPUnit_Framework_Testcase
     public function testChecksumWithClosure()
     {
         // closure must be serializable
-        $sum = 'b87586a50f98a5bf404a8571e9db941d';
+        $sum = 'e869cab5431815e67583b7c8cf3b657a';
         $img = new ImageCache;
         $img->canvas(300, 200, 'fff');
         $img->text('foo', 0, 0, function($font) {
@@ -97,7 +97,7 @@ class ImageCacheTest extends PHPUnit_Framework_Testcase
         $this->assertEquals($img->checksum(), $sum);
 
         // checksum must differ, if values in closure change
-        $sum = 'bdc29e647cfa9529a83a513a8e1e48f6';
+        $sum = 'ec538f3194720c4657edde6af8145730';
         $img = new ImageCache;
         $img->canvas(300, 200, 'fff');
         $img->text('foo', 0, 0, function($font) {
