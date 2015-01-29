@@ -4,21 +4,17 @@ Intervention Image Cache extends the [Intervention Image Class](https://github.c
 
 The library uses the [Illuminate/Cache](https://github.com/illuminate/cache/) package and can be easily integrated into the [Laravel Framework](https://laravel.com/). Based on your Laravel cache configuration you are able to choose between Filesystem, Database, Memcached or Redis for the temporary buffer store.
 
-The principle is simple. Every method call to the Intervention Image class is captured and checked by the caching interface. If this particular sequence of operations already have taken place, the data will be loaded directly from the cache instead of a resource-intensive GD operation.
+The principle is simple. Every method call to the Intervention Image class is captured and checked by the caching interface. If this particular sequence of operations already have taken place, the data will be loaded directly from the cache instead of a resource-intensive image operation.
 
 ## Installation
 
-You can install this Image class quickly and easily with Composer.
+You can install this package quickly and easily with Composer.
 
-Require the package via Composer in your `composer.json`.
+Require the package via Composer:
 
-    "intervention/imagecache": "2.*"
+    $ composer require intervention/imagecache
 
-Run Composer to install or update the new requirement.
-
-    $ composer update
-
-Now you are able to require the `vendor/autoload.php` file to PSR-0 autoload the library.
+Now you are able to require the `vendor/autoload.php` file to PSR-4 autoload the library.
 
 ### Laravel Integration
 
