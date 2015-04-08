@@ -40,26 +40,21 @@ return array(
     | Manipulation templates
     |--------------------------------------------------------------------------
     |
-    | Here you may specify your own manipulation callbacks.
+    | Here you may specify your own manipulation filter templates.
     | The keys of this array will define which templates 
     | are available in the URI:
     |
     | {route}/{template}/{filename}
     |
+    | The values of this array will define which filter class
+    | will be applied, by its fully qualified name.
+    |
     */
    
     'templates' => array(
-
-        'small' => function($image) { 
-            return $image->fit(120, 90);
-        },
-        'medium' => function($image) {
-            return $image->fit(240, 180);
-        },
-        'large' => function($image) {
-            return $image->fit(480, 360);
-        }
-
+        'small' => 'Intervention\Image\Templates\Small',
+        'medium' => 'Intervention\Image\Templates\Medium',
+        'large' => 'Intervention\Image\Templates\Large',
     ),
 
     /*
