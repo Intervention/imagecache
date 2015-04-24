@@ -10,6 +10,25 @@ use Illuminate\Http\Response as IlluminateResponse;
 class ImageCacheController extends BaseController
 {
     /**
+     * Get HTTP response of either original image file or
+     * template applied file.
+     *
+     * @param  string $template
+     * @param  string $filename
+     * @return Illuminate\Http\Response
+     */
+    public function getResponse($template, $filename)
+    {
+        switch (strtolower($template)) {
+            case 'original':
+                return $this->getOriginal($filename);
+            
+            default:
+                return $this->getImage($template, $filename);
+        }
+    }
+
+    /**
      * Get HTTP response of template applied image file
      *
      * @param  string $template
