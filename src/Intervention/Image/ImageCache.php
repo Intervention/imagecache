@@ -9,14 +9,14 @@ class ImageCache
 {
     /**
      * Cache lifetime in minutes
-     * 
+     *
      * @var integer
      */
     public $lifetime = 5;
 
     /**
      * History of name and arguments of calls performed on image
-     * 
+     *
      * @var array
      */
     public $calls = array();
@@ -30,7 +30,7 @@ class ImageCache
 
     /**
      * Processed Image
-     * 
+     *
      * @var Intervention\Image\Image
      */
     public $image;
@@ -55,9 +55,9 @@ class ImageCache
     public function __construct(ImageManager $manager = null, Cache $cache = null)
     {
         $this->manager = $manager ? $manager : new ImageManager;
-        
+
         if (is_null($cache)) {
-            
+
             // get laravel app
             $app = function_exists('app') ? app() : null;
 
@@ -72,7 +72,7 @@ class ImageCache
                 $this->cache = $cache;
 
             } else {
-                    
+
                 // define path in filesystem
                 if (isset($manager->config['cache']['path'])) {
                     $path = $manager->config['cache']['path'];
@@ -87,7 +87,7 @@ class ImageCache
             }
 
         } else {
-            
+
             $this->cache = $cache;
         }
     }
@@ -154,7 +154,7 @@ class ImageCache
 
     /**
      * Returns checksum of current image state
-     * 
+     *
      * @return string
      */
     public function checksum()
@@ -179,7 +179,7 @@ class ImageCache
 
     /**
      * Clears history of calls
-     * 
+     *
      * @return void
      */
     private function clearCalls()
@@ -189,7 +189,7 @@ class ImageCache
 
     /**
      * Clears all currently set properties
-     * 
+     *
      * @return void
      */
     private function clearProperties()
@@ -199,7 +199,7 @@ class ImageCache
 
     /**
      * Return unprocessed calls
-     * 
+     *
      * @return array
      */
     private function getCalls()
@@ -238,7 +238,7 @@ class ImageCache
         switch (true) {
             case class_exists('SuperClosure\\SerializableClosure'):
                 return new \SuperClosure\SerializableClosure($closure);
-            
+
             default:
                 return new \Jeremeamia\SuperClosure\SerializableClosure($closure);
         }
@@ -246,7 +246,7 @@ class ImageCache
 
     /**
      * Process call on current image
-     * 
+     *
      * @param  array $call
      * @return void
      */
@@ -257,7 +257,7 @@ class ImageCache
 
     /**
      * Process all saved image calls on Image object
-     * 
+     *
      * @return Intervention\Image\Image
      */
     public function process()
@@ -283,7 +283,7 @@ class ImageCache
     /**
      * Get image either from cache or directly processed
      * and save image in cache if it's not saved yet
-     * 
+     *
      * @param  int  $lifetime
      * @param  bool $returnObj
      * @return mixed
@@ -304,10 +304,10 @@ class ImageCache
             if ($returnObj) {
                 $image = $this->manager->make($cachedImageData);
                 $image->cachekey = $key;
-                $image->cached = true;
+                $image->setCached(true);
                 return $image;
             }
-        
+
             // return raw data
             return $cachedImageData;
 
@@ -318,8 +318,8 @@ class ImageCache
 
             // encode image data only if image is not encoded yet
             $image = $image->encoded ? $image->encoded : $image->encode();
-            
-            $image->cached = false;
+
+            $image->setCached(false);
 
             // save to cache...
             $this->cache->put($key, (string) $image, $lifetime);
