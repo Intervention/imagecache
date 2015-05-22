@@ -304,6 +304,7 @@ class ImageCache
             if ($returnObj) {
                 $image = $this->manager->make($cachedImageData);
                 $image->cachekey = $key;
+                $image->cached = true;
                 return $image;
             }
         
@@ -317,6 +318,8 @@ class ImageCache
 
             // encode image data only if image is not encoded yet
             $image = $image->encoded ? $image->encoded : $image->encode();
+            
+            $image->cached = false;
 
             // save to cache...
             $this->cache->put($key, (string) $image, $lifetime);
