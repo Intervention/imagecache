@@ -2,7 +2,7 @@
 
 use Intervention\Image\ImageCache;
 
-class ImageCacheTest extends PHPUnit_Framework_Testcase
+class ImageCacheTest extends PHPUnit_Framework_TestCase
 {
     public function tearDown()
     {
