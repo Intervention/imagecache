@@ -303,8 +303,8 @@ class ImageCache
             // transform into image-object
             if ($returnObj) {
                 $image = $this->manager->make($cachedImageData);
-                $image->cachekey = $key;
-                return $image;
+                $cachedImage = new CachedImage;
+                return $cachedImage->setFromOriginal($image, $key);
             }
         
             // return raw data
