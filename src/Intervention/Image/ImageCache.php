@@ -316,13 +316,13 @@ class ImageCache
             $image = $this->process();
 
             // encode image data only if image is not encoded yet
-            $image = $image->encoded ? $image->encoded : $image->encode();
+            $encoded = $image->encoded ? $image->encoded : (string) $image->encode();
 
             // save to cache...
-            $this->cache->put($key, (string) $image, $lifetime);
+            $this->cache->put($key, $encoded, $lifetime);
 
             // return processed image
-            return $returnObj ? $image : (string) $image;
+            return $returnObj ? $image : $encoded;
         }
     }
 }
