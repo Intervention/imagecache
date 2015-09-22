@@ -23,6 +23,9 @@ class ImageCacheController extends BaseController
         switch (strtolower($template)) {
             case 'original':
                 return $this->getOriginal($filename);
+
+            case 'download':
+                return $this->getDownload($filename);
             
             default:
                 return $this->getImage($template, $filename);
@@ -69,6 +72,22 @@ class ImageCacheController extends BaseController
         $path = $this->getImagePath($filename);
 
         return $this->buildResponse(file_get_contents($path));
+    }
+
+    /**
+     * Get HTTP response of original image as download
+     *
+     * @param  string $filename
+     * @return Illuminate\Http\Response
+     */
+    public function getDownload($filename)
+    {
+        $response = $this->getOriginal($filename);
+
+        return $response->header(
+            'Content-Disposition',
+            'attachment; filename=' . $filename
+        );
     }
 
     /**
