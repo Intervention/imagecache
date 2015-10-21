@@ -3,13 +3,22 @@
 namespace Intervention\Image;
 
 use Closure;
+use Intervention\Image\Exception\RuntimeException;
 use Intervention\Image\ImageManager;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Http\Response as IlluminateResponse;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Config;
 
 class ImageCacheController extends BaseController
 {
+    /**
+     * Filesystem storage
+     *
+     * @var \Illuminate\Contracts\Filesystem\Filesystem
+     */
+    private $filesystem;
+
     /**
      * Get HTTP response of either original image file or
      * template applied file.
@@ -42,18 +51,18 @@ class ImageCacheController extends BaseController
     public function getImage($template, $filename)
     {
         $template = $this->getTemplate($template);
-        $path = $this->getImagePath($filename);
+        list($file, $mtime) = $this->getImageFileData($filename);
 
         // image manipulation based on callback
         $manager = new ImageManager(Config::get('image'));
-        $content = $manager->cache(function ($image) use ($template, $path) {
+        $content = $manager->cache(function ($image) use ($template, $file, $mtime) {
 
             if ($template instanceof Closure) {
                 // build from closure callback template
-                $template($image->make($path));
+                $template($image->make($file, $mtime));
             } else {
                 // build from filter template
-                $image->make($path)->filter($template);
+                $image->make($file, $mtime)->filter($template);
             }
             
         }, config('imagecache.lifetime'));
@@ -117,25 +126,17 @@ class ImageCacheController extends BaseController
     }
 
     /**
-     * Returns full image path from given filename
+     * Return image file and modified date from given filename
      *
-     * @param  string $filename
-     * @return string
+     * @return array
      */
-    private function getImagePath($filename)
+    private function getImageFileData($filename)
     {
-        // find file
-        foreach (config('imagecache.paths') as $path) {
-            // don't allow '..' in filenames
-            $image_path = $path.'/'.str_replace('..', '', $filename);
-            if (file_exists($image_path) && is_file($image_path)) {
-                // file found
-                return $image_path;
-            }
+        try {
+            return [$this->getFilesystem()->get($filename), $this->getFilesystem()->lastModified($filename)];
+        } catch (FileNotFoundException $e) {
+            abort(404);
         }
-
-        // file not found
-        abort(404);
     }
 
     /**
@@ -155,5 +156,31 @@ class ImageCacheController extends BaseController
             'Cache-Control' => 'max-age='.(config('imagecache.lifetime')*60).', public',
             'Etag' => md5($content)
         ));
+    }
+
+    /**
+     * Get Filesystem storage
+     *
+     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     */
+    private function getFilesystem()
+    {
+        if ($this->filesystem) {
+            return $this->filesystem;
+        }
+
+        $driver = config('imagecache.driver', 'native');
+
+        if ($driver == 'native') {
+            $filesystem = new Filesystem(config('imagecache.paths'));
+        } else {
+            $filesystem = app('filesystem')->disk($driver);
+        }
+
+        if (!$filesystem) {
+            throw new RuntimeException('Cannot instantiate filesystem');
+        }
+
+        return $this->filesystem = $filesystem;
     }
 }

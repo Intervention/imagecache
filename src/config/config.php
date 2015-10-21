@@ -20,6 +20,18 @@ return array(
 
     /*
     |--------------------------------------------------------------------------
+    | Filesystem driver
+    |--------------------------------------------------------------------------
+    |
+    | You can use either 'native' driver to search files in defined paths
+    | or use Laravel filesystem driver name to get files from cloud storage.
+    |
+    */
+
+    'driver' => 'native',
+
+    /*
+    |--------------------------------------------------------------------------
     | Storage paths
     |--------------------------------------------------------------------------
     |

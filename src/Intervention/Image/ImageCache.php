@@ -110,12 +110,15 @@ class ImageCache
      * Special make method to add modifed data to checksum
      *
      * @param  mixed $data
+     * @param  int   $modified
      * @return Intervention\Image\ImageCache
      */
-    public function make($data)
+    public function make($data, $modified = null)
     {
         // include "modified" property for any files
-        if ($this->isFile($data)) {
+        if ($modified) {
+            $this->setProperty('modified', $modified);
+        } elseif ($this->isFile($data)) {
             $this->setProperty('modified', filemtime((string) $data));
         }
 
