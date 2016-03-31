@@ -109,7 +109,7 @@ class ImageCacheController extends BaseController
             case is_string($template) && class_exists($template):
                 return new $template;
 
-            // filter template is a class with arguments
+            // filter with arguments template found
             case is_array($template):
                 $rc = new \ReflectionClass(array_shift($template));
                 return $rc->newInstanceArgs($template);
