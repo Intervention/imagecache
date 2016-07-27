@@ -41,19 +41,19 @@ class ImageCacheController extends BaseController
      */
     public function getImage($template, $filename)
     {
-        $template = $this->getTemplate($template);
+        list($template, $args) = $this->getTemplate($template);
         $path = $this->getImagePath($filename);
 
         // image manipulation based on callback
         $manager = new ImageManager(Config::get('image'));
-        $content = $manager->cache(function ($image) use ($template, $path) {
+        $content = $manager->cache(function ($image) use ($template, $args, $path) {
 
             if ($template instanceof Closure) {
                 // build from closure callback template
-                $template($image->make($path));
+                $template($image->make($path), $args);
             } else {
                 // build from filter template
-                $image->make($path)->filter($template);
+                $image->make($path)->filter($template, $args);
             }
             
         }, config('imagecache.lifetime'));
@@ -98,16 +98,24 @@ class ImageCacheController extends BaseController
      */
     private function getTemplate($template)
     {
-        $template = config("imagecache.templates.{$template}");
+        $args = array();
+        $data = config('imagecache.templates.'.$template);
+
+        if(is_array($data)){
+            $class = $data['class'];
+            $args = isset($data['args'])?$data['args']:array();
+        }else{
+            $class = $data;
+        }
 
         switch (true) {
             // closure template found
-            case is_callable($template):
-                return $template;
+            case is_callable($class):
+                return [$class, $args];
 
             // filter template found
-            case class_exists($template):
-                return new $template;
+            case class_exists($class):
+                return [new $class, $args];
             
             default:
                 // template not found
