@@ -6,6 +6,7 @@ use Closure;
 use Intervention\Image\ImageManager;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Http\Response as IlluminateResponse;
+use Symfony\Component\Finder\Finder;
 use Config;
 
 class ImageCacheController extends BaseController
