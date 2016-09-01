@@ -37,6 +37,30 @@ return array(
 
     /*
     |--------------------------------------------------------------------------
+    | Priority Storage Paths
+    |--------------------------------------------------------------------------
+    |
+    | Here you can associte some image source paths
+    | specific to a particular tempalate.
+    |
+    | Example:
+    |
+    | 'blog' => array(
+    |    public_path('images/blog'),
+    |    public_path('upload/blog'),
+    | ),
+    | 'profile' => array(
+    |    public_path('upload/profile'),
+    | ),
+    |
+    */
+
+    'priority_paths' => array(
+
+    ),
+
+    /*
+    |--------------------------------------------------------------------------
     | Manipulation templates
     |--------------------------------------------------------------------------
     |

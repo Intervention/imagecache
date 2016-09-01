@@ -41,8 +41,8 @@ class ImageCacheController extends BaseController
      */
     public function getImage($template, $filename)
     {
+        $path = $this->getImagePath($filename, $template);
         $template = $this->getTemplate($template);
-        $path = $this->getImagePath($filename);
 
         // image manipulation based on callback
         $manager = new ImageManager(Config::get('image'));
@@ -122,8 +122,20 @@ class ImageCacheController extends BaseController
      * @param  string $filename
      * @return string
      */
-    private function getImagePath($filename)
+    private function getImagePath($filename, $template=null)
     {
+        // find file in priority locations
+        if(!is_null($template) && array_key_exists($template, config('imagecache.priority_paths'))) {
+            foreach(config("imagecache.priority_paths.$template") as $path) {
+                // don't allow '..' in filenames
+                $image_path = $path.'/'.str_replace('..', '', $filename);
+                if (file_exists($image_path) && is_file($image_path)) {
+                    // file found
+                    return $image_path;
+                }
+            }
+        }
+
         // find file
         foreach (config('imagecache.paths') as $path) {
             // don't allow '..' in filenames
