@@ -96,7 +96,7 @@ class ImageCacheController extends BaseController
      * @param  string $template
      * @return mixed
      */
-    private function getTemplate($template)
+    protected function getTemplate($template)
     {
         $template = config("imagecache.templates.{$template}");
 
@@ -122,7 +122,7 @@ class ImageCacheController extends BaseController
      * @param  string $filename
      * @return string
      */
-    private function getImagePath($filename)
+    protected function getImagePath($filename)
     {
         // find file
         foreach (config('imagecache.paths') as $path) {
@@ -144,7 +144,7 @@ class ImageCacheController extends BaseController
      * @param  string $content 
      * @return Illuminate\Http\Response
      */
-    private function buildResponse($content)
+    protected function buildResponse($content)
     {
         // define mime type
         $mime = finfo_buffer(finfo_open(FILEINFO_MIME_TYPE), $content);

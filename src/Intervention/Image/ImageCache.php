@@ -131,7 +131,7 @@ class ImageCache
      * @param  mixed $value
      * @return boolean
      */
-    private function isFile($value)
+    protected function isFile($value)
     {
         $value = strval(str_replace("\0", "", $value));
 
@@ -172,7 +172,7 @@ class ImageCache
      * @param  array  $arguments
      * @return void
      */
-    private function registerCall($name, $arguments)
+    protected function registerCall($name, $arguments)
     {
         $this->calls[] = array('name' => $name, 'arguments' => $arguments);
     }
@@ -182,7 +182,7 @@ class ImageCache
      * 
      * @return void
      */
-    private function clearCalls()
+    protected function clearCalls()
     {
         $this->calls = array();
     }
@@ -192,7 +192,7 @@ class ImageCache
      * 
      * @return void
      */
-    private function clearProperties()
+    protected function clearProperties()
     {
         $this->properties = array();
     }
@@ -202,7 +202,7 @@ class ImageCache
      * 
      * @return array
      */
-    private function getCalls()
+    protected function getCalls()
     {
         return count($this->calls) ? $this->calls : array();
     }
@@ -212,7 +212,7 @@ class ImageCache
      *
      * @return array
      */
-    private function getSanitizedCalls()
+    protected function getSanitizedCalls()
     {
         $calls = $this->getCalls();
 
@@ -233,7 +233,7 @@ class ImageCache
      * @param  Closure $closure
      * @return Jeremeamia\SuperClosure\SerializableClosure|SuperClosure\SerializableClosure
      */
-    private function buildSerializableClosure(\Closure $closure)
+    protected function buildSerializableClosure(\Closure $closure)
     {
         switch (true) {
             case class_exists('SuperClosure\\SerializableClosure'):
@@ -250,7 +250,7 @@ class ImageCache
      * @param  array $call
      * @return void
      */
-    private function processCall($call)
+    protected function processCall($call)
     {
         $this->image = call_user_func_array(array($this->image, $call['name']), $call['arguments']);
     }
