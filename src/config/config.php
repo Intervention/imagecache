@@ -23,7 +23,7 @@ return array(
     | Storage paths
     |--------------------------------------------------------------------------
     |
-    | The following paths will be searched for the image filename, submited 
+    | The following paths will be searched for the image filename, submitted 
     | by URI. 
     | 
     | Define as many directories as you like.
