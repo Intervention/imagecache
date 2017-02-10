@@ -149,11 +149,17 @@ class ImageCacheController extends BaseController
         // define mime type
         $mime = finfo_buffer(finfo_open(FILEINFO_MIME_TYPE), $content);
 
+        // respond with 304 not modified if browser has the image cached
+        $etag = md5($content);
+        $not_modified = isset($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] == $etag;
+        $content = $not_modified ? NULL : $content;
+        $status_code = $not_modified ? 304 : 200;
+
         // return http response
-        return new IlluminateResponse($content, 200, array(
+        return new IlluminateResponse($content, $status_code, array(
             'Content-Type' => $mime,
             'Cache-Control' => 'max-age='.(config('imagecache.lifetime')*60).', public',
-            'Etag' => md5($content)
+            'Etag' => $etag
         ));
     }
 }
