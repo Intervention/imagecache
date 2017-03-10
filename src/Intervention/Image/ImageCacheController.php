@@ -3,6 +3,7 @@
 namespace Intervention\Image;
 
 use Closure;
+use Illuminate\Http\Request;
 use Intervention\Image\ImageManager;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Http\Response as IlluminateResponse;
@@ -18,8 +19,10 @@ class ImageCacheController extends BaseController
      * @param  string $filename
      * @return Illuminate\Http\Response
      */
-    public function getResponse($template, $filename)
+    public function getResponse(Request $request, $filename)
     {
+        $template = $request->segment(substr_count(config('imagecache.route'), '/')+2);
+
         switch (strtolower($template)) {
             case 'original':
                 return $this->getOriginal($filename);
