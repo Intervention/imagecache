@@ -71,6 +71,12 @@ class ImageCache
                 // add laravel cache
                 $this->cache = $cache;
 
+                // change cache store if set
+                $cacheStore = $app->config->get('imagecache.cache-store', null);
+                if(!is_null($cacheStore)) {
+                    $cache = $cache->store($cacheStore);
+                }
+
             } else {
                     
                 // define path in filesystem
