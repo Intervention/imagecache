@@ -135,7 +135,7 @@ class ImageCache
     {
         $value = strval(str_replace("\0", "", $value));
 
-        return is_file($value);
+        return strlen($value) <= PHP_MAXPATHLEN && is_file($value);
     }
 
     /**
