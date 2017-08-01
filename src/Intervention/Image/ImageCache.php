@@ -74,7 +74,7 @@ class ImageCache
                 // change cache store if set
                 $cacheStore = $app->config->get('imagecache.cache-store', null);
                 if(!is_null($cacheStore)) {
-                    $cache = $cache->store($cacheStore);
+                    $this->cache = $cache->store($cacheStore);
                 }
 
             } else {
