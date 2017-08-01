@@ -72,6 +72,12 @@ class ImageCache
                 $cache_driver = config('imagecache.cache_driver');
                 $this->cache = $cache_driver ? $cache->driver($cache_driver) : $cache;
 
+                // change cache store if set
+                $cacheStore = $app->config->get('imagecache.cache-store', null);
+                if(!is_null($cacheStore)) {
+                    $this->cache = $cache->store($cacheStore);
+                }
+
             } else {
                     
                 // define path in filesystem
