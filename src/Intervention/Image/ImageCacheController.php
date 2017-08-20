@@ -137,7 +137,7 @@ class ImageCacheController extends BaseController
         if (config("imagecache.useDefaultImage")) {
             $defaultImagePath = config("imagecache.defaultImagePath");
 
-            if (file_exists($image_path) && is_file($image_path)) {
+            if (file_exists($defaultImagePath) && is_file($defaultImagePath)) {
                 return $defaultImagePath;
             }
         }
