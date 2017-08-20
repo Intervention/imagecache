@@ -64,6 +64,14 @@ $img = Image::cache(function($image) {
 }, 10, true);
 ```
 
+If want to use default image in your project to show that image when main image not found(like no-image thumbnail and ...) should set true related config:
+
+```php
+'useDefaultImage' => false,
+   
+'defaultImagePath' => 'path-to-default-image.jpg'
+```
+
 ## License
 
 Intervention Imagecache Class is licensed under the [MIT License](http://opensource.org/licenses/MIT).
