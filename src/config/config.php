@@ -68,4 +68,22 @@ return array(
    
     'lifetime' => 43200,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Image Cache Default Image
+    |--------------------------------------------------------------------------
+    |
+    | If set true and main image not found it use default image.
+    |
+    */
+   
+    'useDefaultImage' => false,
+    
+    /*
+    |
+    | If want to use default image should set path of it here.
+    |
+    */
+   
+    'defaultImagePath' => '',
 );

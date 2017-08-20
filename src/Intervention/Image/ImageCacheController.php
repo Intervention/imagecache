@@ -3,10 +3,10 @@
 namespace Intervention\Image;
 
 use Closure;
-use Intervention\Image\ImageManager;
-use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Http\Response as IlluminateResponse;
 use Config;
+use Illuminate\Http\Response as IlluminateResponse;
+use Illuminate\Routing\Controller as BaseController;
+use Intervention\Image\ImageManager;
 
 class ImageCacheController extends BaseController
 {
@@ -26,7 +26,7 @@ class ImageCacheController extends BaseController
 
             case 'download':
                 return $this->getDownload($filename);
-            
+
             default:
                 return $this->getImage($template, $filename);
         }
@@ -42,7 +42,7 @@ class ImageCacheController extends BaseController
     public function getImage($template, $filename)
     {
         $template = $this->getTemplate($template);
-        $path = $this->getImagePath($filename);
+        $path     = $this->getImagePath($filename);
 
         // image manipulation based on callback
         $manager = new ImageManager(Config::get('image'));
@@ -55,7 +55,7 @@ class ImageCacheController extends BaseController
                 // build from filter template
                 $image->make($path)->filter($template);
             }
-            
+
         }, config('imagecache.lifetime'));
 
         return $this->buildResponse($content);
@@ -108,7 +108,7 @@ class ImageCacheController extends BaseController
             // filter template found
             case class_exists($template):
                 return new $template;
-            
+
             default:
                 // template not found
                 abort(404);
@@ -127,13 +127,21 @@ class ImageCacheController extends BaseController
         // find file
         foreach (config('imagecache.paths') as $path) {
             // don't allow '..' in filenames
-            $image_path = $path.'/'.str_replace('..', '', $filename);
+            $image_path = $path . '/' . str_replace('..', '', $filename);
             if (file_exists($image_path) && is_file($image_path)) {
                 // file found
                 return $image_path;
             }
         }
 
+        if (config("imagecache.useDefaultImage")) {
+            $defaultImagePath = config("imagecache.defaultImagePath");
+
+            if (file_exists($defaultImagePath) && is_file($defaultImagePath)) {
+                return $defaultImagePath;
+            }
+        }
+        
         // file not found
         abort(404);
     }
@@ -141,7 +149,7 @@ class ImageCacheController extends BaseController
     /**
      * Builds HTTP response from given image data
      *
-     * @param  string $content 
+     * @param  string $content
      * @return Illuminate\Http\Response
      */
     protected function buildResponse($content)
@@ -150,16 +158,16 @@ class ImageCacheController extends BaseController
         $mime = finfo_buffer(finfo_open(FILEINFO_MIME_TYPE), $content);
 
         // respond with 304 not modified if browser has the image cached
-        $etag = md5($content);
+        $etag         = md5($content);
         $not_modified = isset($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] == $etag;
-        $content = $not_modified ? NULL : $content;
-        $status_code = $not_modified ? 304 : 200;
+        $content      = $not_modified ? null : $content;
+        $status_code  = $not_modified ? 304 : 200;
 
         // return http response
         return new IlluminateResponse($content, $status_code, array(
-            'Content-Type' => $mime,
-            'Cache-Control' => 'max-age='.(config('imagecache.lifetime')*60).', public',
-            'Etag' => $etag
+            'Content-Type'  => $mime,
+            'Cache-Control' => 'max-age=' . (config('imagecache.lifetime') * 60) . ', public',
+            'Etag'          => $etag,
         ));
     }
 }
