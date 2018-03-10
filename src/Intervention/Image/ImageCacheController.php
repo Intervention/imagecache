@@ -51,10 +51,10 @@ class ImageCacheController extends BaseController
 
             if ($template instanceof Closure) {
                 // build from closure callback template
-                $template($image->make(self::getImageData($path)));
+                $template($image->make($path));
             } else {
                 // build from filter template
-                $image->make(self::getImageData($path))->filter($template);
+                $image->make($path)->filter($template);
             }
 
         }, config('imagecache.lifetime'));
