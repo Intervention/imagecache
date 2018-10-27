@@ -7,6 +7,7 @@ use Intervention\Image\ImageManager;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Http\Response as IlluminateResponse;
 use Config;
+use Storage;
 
 class ImageCacheController extends BaseController
 {
@@ -26,7 +27,7 @@ class ImageCacheController extends BaseController
 
             case 'download':
                 return $this->getDownload($filename);
-            
+
             default:
                 return $this->getImage($template, $filename);
         }
@@ -55,7 +56,7 @@ class ImageCacheController extends BaseController
                 // build from filter template
                 $image->make($path)->filter($template);
             }
-            
+
         }, config('imagecache.lifetime'));
 
         return $this->buildResponse($content);
@@ -71,7 +72,7 @@ class ImageCacheController extends BaseController
     {
         $path = $this->getImagePath($filename);
 
-        return $this->buildResponse(file_get_contents($path));
+        return $this->buildResponse(self::getImageData($path));
     }
 
     /**
@@ -108,7 +109,7 @@ class ImageCacheController extends BaseController
             // filter template found
             case class_exists($template):
                 return new $template;
-            
+
             default:
                 // template not found
                 abort(404);
@@ -126,11 +127,13 @@ class ImageCacheController extends BaseController
     {
         // find file
         foreach (config('imagecache.paths') as $path) {
+            list($fs, $dir) = self::parsePath($path);
+            $disk = Storage::disk($fs);
             // don't allow '..' in filenames
-            $image_path = $path.'/'.str_replace('..', '', $filename);
-            if (file_exists($image_path) && is_file($image_path)) {
+            $image_path = $dir.'/'.str_replace('..', '', $filename);
+            if ($disk->exists($image_path)) {
                 // file found
-                return $image_path;
+                return "$fs:$image_path";
             }
         }
 
@@ -139,9 +142,38 @@ class ImageCacheController extends BaseController
     }
 
     /**
+     * Parse a path string.
+     *
+     * @param path a path string
+     * @return array the path components [ 0 => disk name, 1 => file path ]
+     */
+    private static function parsePath($path)
+    {
+        $fs = 'local';
+        $dir = $path;
+        if (preg_match('/(.*):(.*)/', $path, $matches) === 1) {
+            list(, $fs, $dir) = $matches;
+        }
+
+        return [$fs, $dir];
+    }
+
+    /**
+     * Load the image data via the Storage subsystem.
+     *
+     * @param image_path the path to the image from getImagePath()
+     */
+    private static function getImageData($image_path)
+    {
+        list($fs, $path) = self::parsePath($image_path);
+
+        return Storage::disk($fs)->get($path);
+    }
+
+    /**
      * Builds HTTP response from given image data
      *
-     * @param  string $content 
+     * @param  string $content
      * @return Illuminate\Http\Response
      */
     protected function buildResponse($content)
