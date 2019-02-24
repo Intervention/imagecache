@@ -26,7 +26,7 @@ class ImageCacheController extends BaseController
 
             case 'download':
                 return $this->getDownload($filename);
-            
+
             default:
                 return $this->getImage($template, $filename);
         }
@@ -55,7 +55,7 @@ class ImageCacheController extends BaseController
                 // build from filter template
                 $image->make($path)->filter($template);
             }
-            
+
         }, config('imagecache.lifetime'));
 
         return $this->buildResponse($content);
@@ -108,7 +108,7 @@ class ImageCacheController extends BaseController
             // filter template found
             case class_exists($template):
                 return new $template;
-            
+
             default:
                 // template not found
                 abort(404);
@@ -141,7 +141,7 @@ class ImageCacheController extends BaseController
     /**
      * Builds HTTP response from given image data
      *
-     * @param  string $content 
+     * @param  string $content
      * @return Illuminate\Http\Response
      */
     protected function buildResponse($content)

@@ -43,7 +43,7 @@ class ImageCacheTest extends PHPUnit_Framework_TestCase
     public function testMagicMethodCalls()
     {
         $img = new ImageCache;
-        
+
         $img->test1(1, 2, 3);
         $img->test2(null);
         $img->test3(array(1, 2, 3));
@@ -141,7 +141,7 @@ class ImageCacheTest extends PHPUnit_Framework_TestCase
         $result = $img->process();
 
         $this->assertEquals(count($img->calls), 0);
-        $this->assertInstanceOf('Intervention\Image\Image', $result);        
+        $this->assertInstanceOf('Intervention\Image\Image', $result);
         $this->assertEquals('e795d413cf6598f49a8e773ce2e07589', $result->cachekey);
     }
 

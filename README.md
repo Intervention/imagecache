@@ -23,19 +23,18 @@ The Image Cache class supports Laravel integration. Best practice to use the lib
 Open your Laravel config file `config/app.php` and add the following lines.
 
 In the `$providers` array add the service providers for this package.
-    
+
     'providers' => array(
-        
+
         [...]
 
         'Intervention\Image\ImageServiceProvider'
     ),
-    
 
 Add the facade of this package to the `$aliases` array.
 
     'aliases' => array(
-        
+
         [...]
 
         'Image' => 'Intervention\Image\Facades\Image'
