@@ -9,11 +9,11 @@ use Illuminate\Cache\Repository as Cache;
 class ImageCache
 {
     /**
-     * Cache lifetime in seconds
+     * Cache lifetime in minutes
      *
      * @var integer
      */
-    public $lifetime = 300;
+    public $lifetime = 5;
 
     /**
      * History of name and arguments of calls performed on image
@@ -321,7 +321,7 @@ class ImageCache
             $encoded = $image->encoded ? $image->encoded : (string) $image->encode();
 
             // save to cache...
-            $this->cache->put($key, $encoded, Carbon::now()->addSeconds($lifetime));
+            $this->cache->put($key, $encoded, Carbon::now()->addMinutes($lifetime));
 
             // return processed image
             return $returnObj ? $image : $encoded;

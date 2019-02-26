@@ -62,10 +62,10 @@ return array(
     | Image Cache Lifetime
     |--------------------------------------------------------------------------
     |
-    | Lifetime in seconds of the images handled by the imagecache route.
+    | Lifetime in minutes of the images handled by the imagecache route.
     |
     */
 
-    'lifetime' => 2592000,
+    'lifetime' => 43200,
 
 );
