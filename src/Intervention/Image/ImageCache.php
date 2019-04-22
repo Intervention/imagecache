@@ -3,20 +3,21 @@
 namespace Intervention\Image;
 
 use Exception;
+use Carbon\Carbon;
 use Illuminate\Cache\Repository as Cache;
 
 class ImageCache
 {
     /**
      * Cache lifetime in minutes
-     * 
+     *
      * @var integer
      */
     public $lifetime = 5;
 
     /**
      * History of name and arguments of calls performed on image
-     * 
+     *
      * @var array
      */
     public $calls = array();
@@ -30,7 +31,7 @@ class ImageCache
 
     /**
      * Processed Image
-     * 
+     *
      * @var Intervention\Image\Image
      */
     public $image;
@@ -55,9 +56,9 @@ class ImageCache
     public function __construct(ImageManager $manager = null, Cache $cache = null)
     {
         $this->manager = $manager ? $manager : new ImageManager;
-        
+
         if (is_null($cache)) {
-            
+
             // get laravel app
             $app = function_exists('app') ? app() : null;
 
@@ -73,7 +74,7 @@ class ImageCache
                 $this->cache = $cache_driver ? $cache->driver($cache_driver) : $cache;
 
             } else {
-                    
+
                 // define path in filesystem
                 if (isset($manager->config['cache']['path'])) {
                     $path = $manager->config['cache']['path'];
@@ -88,7 +89,7 @@ class ImageCache
             }
 
         } else {
-            
+
             $this->cache = $cache;
         }
     }
@@ -155,7 +156,7 @@ class ImageCache
 
     /**
      * Returns checksum of current image state
-     * 
+     *
      * @return string
      */
     public function checksum()
@@ -180,7 +181,7 @@ class ImageCache
 
     /**
      * Clears history of calls
-     * 
+     *
      * @return void
      */
     protected function clearCalls()
@@ -190,7 +191,7 @@ class ImageCache
 
     /**
      * Clears all currently set properties
-     * 
+     *
      * @return void
      */
     protected function clearProperties()
@@ -200,7 +201,7 @@ class ImageCache
 
     /**
      * Return unprocessed calls
-     * 
+     *
      * @return array
      */
     protected function getCalls()
@@ -239,7 +240,7 @@ class ImageCache
         switch (true) {
             case class_exists('SuperClosure\\SerializableClosure'):
                 return new \SuperClosure\SerializableClosure($closure);
-            
+
             default:
                 return new \Jeremeamia\SuperClosure\SerializableClosure($closure);
         }
@@ -247,7 +248,7 @@ class ImageCache
 
     /**
      * Process call on current image
-     * 
+     *
      * @param  array $call
      * @return void
      */
@@ -258,7 +259,7 @@ class ImageCache
 
     /**
      * Process all saved image calls on Image object
-     * 
+     *
      * @return Intervention\Image\Image
      */
     public function process()
@@ -284,7 +285,7 @@ class ImageCache
     /**
      * Get image either from cache or directly processed
      * and save image in cache if it's not saved yet
-     * 
+     *
      * @param  int  $lifetime
      * @param  bool $returnObj
      * @return mixed
@@ -307,7 +308,7 @@ class ImageCache
                 $cachedImage = new CachedImage;
                 return $cachedImage->setFromOriginal($image, $key);
             }
-        
+
             // return raw data
             return $cachedImageData;
 
@@ -320,7 +321,7 @@ class ImageCache
             $encoded = $image->encoded ? $image->encoded : (string) $image->encode();
 
             // save to cache...
-            $this->cache->put($key, $encoded, $lifetime);
+            $this->cache->put($key, $encoded, Carbon::now()->addMinutes($lifetime));
 
             // return processed image
             return $returnObj ? $image : $encoded;
