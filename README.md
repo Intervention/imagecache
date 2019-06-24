@@ -42,21 +42,24 @@ Add the facade of this package to the `$aliases` array.
 
 Publish Configuration 
 
-`php artisan vendor:publish --provider="Intervention\Image\ImageServiceProviderLaravel5"`
+	$php artisan vendor:publish --provider="Intervention\Image\ImageServiceProviderLaravel5"
 
 In file config/imagecache.php
 
-`'route' => 'cache'`
+	`'route' => 'cache'`
+	
 Then Edit your paths. Add line
-`storage_path('app/public'),`
+
+	`storage_path('app/public'),`
 
 ##Nginx Config
-`
+
+```
 location ~* ^/cache.+\.(jpg|jpeg|gif|png|bmp|JPG)$ {
 	try_files $uri $uri/ /index.php?$query_string;
 	log_not_found off;
 }
-`
+```
 
 ## Usage
 
