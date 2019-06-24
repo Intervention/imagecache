@@ -44,11 +44,11 @@ Publish Configuration
 
 	$php artisan vendor:publish --provider="Intervention\Image\ImageServiceProviderLaravel5"
 
-In file config/imagecache.php
+In file `config/imagecache.php`
 
 	'route' => 'cache'
 	
-Then Edit your paths. Add line
+Then Edit your `$paths` array in this file. Add line
 
 	storage_path('app/public'),
 
