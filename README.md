@@ -46,11 +46,11 @@ Publish Configuration
 
 In file config/imagecache.php
 
-	`'route' => 'cache'`
+	'route' => 'cache'
 	
 Then Edit your paths. Add line
 
-	`storage_path('app/public'),`
+	storage_path('app/public'),
 
 ##Nginx Config
 
