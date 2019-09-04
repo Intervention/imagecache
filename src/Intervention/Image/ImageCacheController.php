@@ -55,7 +55,6 @@ class ImageCacheController extends BaseController
                 // build from filter template
                 $image->make($path)->filter($template);
             }
-
         }, config('imagecache.lifetime'));
 
         return $this->buildResponse($content);
@@ -152,7 +151,7 @@ class ImageCacheController extends BaseController
         // respond with 304 not modified if browser has the image cached
         $etag = md5($content);
         $not_modified = isset($_SERVER['HTTP_IF_NONE_MATCH']) && $_SERVER['HTTP_IF_NONE_MATCH'] == $etag;
-        $content = $not_modified ? NULL : $content;
+        $content = $not_modified ? null : $content;
         $status_code = $not_modified ? 304 : 200;
 
         // return http response

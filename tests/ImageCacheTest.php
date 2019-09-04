@@ -14,8 +14,7 @@ class ImageCacheTest extends PHPUnit_Framework_TestCase
     {
         $files = new \Illuminate\Filesystem\Filesystem;
 
-        foreach ($files->directories('storage/cache') as $directory)
-        {
+        foreach ($files->directories('storage/cache') as $directory) {
             $files->deleteDirectory($directory);
         }
     }
@@ -90,7 +89,7 @@ class ImageCacheTest extends PHPUnit_Framework_TestCase
         $sum = 'e869cab5431815e67583b7c8cf3b657a';
         $img = new ImageCache;
         $img->canvas(300, 200, 'fff');
-        $img->text('foo', 0, 0, function($font) {
+        $img->text('foo', 0, 0, function ($font) {
             $font->valign('top');
             $font->size(32);
         });
@@ -100,7 +99,7 @@ class ImageCacheTest extends PHPUnit_Framework_TestCase
         $sum = 'ec538f3194720c4657edde6af8145730';
         $img = new ImageCache;
         $img->canvas(300, 200, 'fff');
-        $img->text('foo', 0, 0, function($font) {
+        $img->text('foo', 0, 0, function ($font) {
             $font->valign('top');
             $font->size(30);
         });

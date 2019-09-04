@@ -58,7 +58,6 @@ class ImageCache
         $this->manager = $manager ? $manager : new ImageManager;
 
         if (is_null($cache)) {
-
             // get laravel app
             $app = function_exists('app') ? app() : null;
 
@@ -68,13 +67,10 @@ class ImageCache
             }
 
             if (is_a($cache, 'Illuminate\Cache\CacheManager')) {
-
                 // add laravel cache and set custom cache_driver if persist
                 $cache_driver = config('imagecache.cache_driver');
                 $this->cache = $cache_driver ? $cache->driver($cache_driver) : $cache;
-
             } else {
-
                 // define path in filesystem
                 if (isset($manager->config['cache']['path'])) {
                     $path = $manager->config['cache']['path'];
@@ -87,9 +83,7 @@ class ImageCache
                 $storage = new \Illuminate\Cache\FileStore($filesystem, $path);
                 $this->cache = new \Illuminate\Cache\Repository($storage);
             }
-
         } else {
-
             $this->cache = $cache;
         }
     }
@@ -301,7 +295,6 @@ class ImageCache
 
         // if imagedata exists in cache
         if ($cachedImageData) {
-
             // transform into image-object
             if ($returnObj) {
                 $image = $this->manager->make($cachedImageData);
@@ -311,9 +304,7 @@ class ImageCache
 
             // return raw data
             return $cachedImageData;
-
         } else {
-
             // process image data
             $image = $this->process();
 
