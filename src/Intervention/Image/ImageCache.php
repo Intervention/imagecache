@@ -64,6 +64,8 @@ class ImageCache
             // if laravel app cache exists
             if (is_a($app, 'Illuminate\Foundation\Application')) {
                 $cache = $app->make('cache');
+            } else if (is_a($app, 'Laravel\Lumen\Application')) {
+                $cache = $app->make('cache');
             }
 
             if (is_a($cache, 'Illuminate\Cache\CacheManager')) {
