@@ -195,7 +195,7 @@ class ImageCacheTest extends PHPUnit_Framework_TestCase
         $manager->shouldReceive('make')->with('foo/bar.jpg')->once()->andReturn($image);
         $cache = Mockery::mock('\Illuminate\Cache\Repository');
         $cache->shouldReceive('get')->with($checksum)->once()->andReturn(false);
-        $cache->shouldReceive('put')->with($checksum, $imagedata, \Mockery::type('Carbon\\Carbon'))->once()->andReturn(false);
+        $cache->shouldReceive('put')->with($checksum, $imagedata, Mockery::type('\Carbon\Carbon'))->once()->andReturn(false);
 
         $img = new ImageCache($manager, $cache);
         $img->make('foo/bar.jpg');
@@ -219,7 +219,7 @@ class ImageCacheTest extends PHPUnit_Framework_TestCase
         $manager->shouldReceive('make')->with('foo/bar.jpg')->once()->andReturn($image);
         $cache = Mockery::mock('\Illuminate\Cache\Repository');
         $cache->shouldReceive('get')->with($checksum)->once()->andReturn(false);
-        $cache->shouldReceive('put')->with($checksum, $imagedata, \Mockery::type('Carbon\\Carbon'))->once()->andReturn(false);
+        $cache->shouldReceive('put')->with($checksum, $imagedata, Mockery::type('\Carbon\Carbon'))->once()->andReturn(false);
 
         $img = new ImageCache($manager, $cache);
         $img->make('foo/bar.jpg');
