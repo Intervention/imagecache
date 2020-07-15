@@ -227,17 +227,11 @@ class ImageCache
      * Build SerializableClosure from Closure
      *
      * @param  Closure $closure
-     * @return Jeremeamia\SuperClosure\SerializableClosure|SuperClosure\SerializableClosure
+     * @return \Opis\Closure\SerializableClosure
      */
     protected function buildSerializableClosure(\Closure $closure)
     {
-        switch (true) {
-            case class_exists('SuperClosure\\SerializableClosure'):
-                return new \SuperClosure\SerializableClosure($closure);
-
-            default:
-                return new \Jeremeamia\SuperClosure\SerializableClosure($closure);
-        }
+        return new \Opis\Closure\SerializableClosure($closure);
     }
 
     /**
