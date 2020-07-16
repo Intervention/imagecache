@@ -6,6 +6,7 @@ use Closure;
 use Intervention\Image\ImageManager;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Http\Response as IlluminateResponse;
+use Symfony\Component\Finder\Finder;
 use Config;
 
 class ImageCacheController extends BaseController
@@ -124,17 +125,23 @@ class ImageCacheController extends BaseController
     protected function getImagePath($filename)
     {
         // find file
+        $finder = new Finder;
+
         foreach (config('imagecache.paths') as $path) {
-            // don't allow '..' in filenames
-            $image_path = $path.'/'.str_replace('..', '', $filename);
-            if (file_exists($image_path) && is_file($image_path)) {
-                // file found
-                return $image_path;
-            }
+            $finder->in($path);
+        }
+
+        $finder->files()->name($filename);
+
+        $files = iterator_to_array($finder->getIterator());
+
+        if (count($files)) {
+            return array_keys($files)[0];
         }
 
         // file not found
         abort(404);
+        
     }
 
     /**
