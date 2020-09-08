@@ -19,15 +19,15 @@
     ],
     "require": {
         "php": ">=5.3.0",
-        "intervention/image": "dev-master|~2,>=2.2.0",
-        "illuminate/cache": "~4|~5|~6|~7",
-        "illuminate/filesystem": "~4|~5|~6|~7",
+        "intervention/image": "dev-master|~2,>=2.2.0|^2.5",
+        "illuminate/cache": "~4|~5|~6|~7|^8.0",
+        "illuminate/filesystem": "~4|~5|~6|~7|^8.0",
         "jeremeamia/superclosure": "~1|~2",
         "nesbot/carbon": "^1.26.3 || ^2.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "3.*",
-        "mockery/mockery": "~0.9.2"
+        "phpunit/phpunit": "3.*|^9.3",
+        "mockery/mockery": "~0.9.2|^1.3.1"
     },
     "autoload": {
         "psr-4": {
