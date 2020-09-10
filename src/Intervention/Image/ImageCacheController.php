@@ -3,10 +3,10 @@
 namespace Intervention\Image;
 
 use Closure;
+use Config;
 use Intervention\Image\ImageManager;
 use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Http\Response as IlluminateResponse;
-use Config;
 
 class ImageCacheController extends BaseController
 {
@@ -106,7 +106,7 @@ class ImageCacheController extends BaseController
 
             // filter template found
             case class_exists($template):
-                return new $template;
+                return new $template();
 
             default:
                 // template not found
@@ -126,7 +126,7 @@ class ImageCacheController extends BaseController
         // find file
         foreach (config('imagecache.paths') as $path) {
             // don't allow '..' in filenames
-            $image_path = $path.'/'.str_replace('..', '', $filename);
+            $image_path = $path . '/' . str_replace('..', '', $filename);
             if (file_exists($image_path) && is_file($image_path)) {
                 // file found
                 return $image_path;
@@ -155,11 +155,11 @@ class ImageCacheController extends BaseController
         $status_code = $not_modified ? 304 : 200;
 
         // return http response
-        return new IlluminateResponse($content, $status_code, array(
+        return new IlluminateResponse($content, $status_code, [
             'Content-Type' => $mime,
-            'Cache-Control' => 'max-age='.(config('imagecache.lifetime')*60).', public',
+            'Cache-Control' => 'max-age=' . (config('imagecache.lifetime') * 60) . ', public',
             'Content-Length' => strlen($content),
             'Etag' => $etag
-        ));
+        ]);
     }
 }

@@ -2,10 +2,13 @@
 
 namespace Intervention\Image;
 
-use Closure;
 use Carbon\Carbon;
+use Closure;
 use Exception;
+use Illuminate\Cache\FileStore;
 use Illuminate\Cache\Repository as Cache;
+use Illuminate\Cache\Repository;
+use Illuminate\Filesystem\Filesystem;
 
 class ImageCache
 {
@@ -21,14 +24,14 @@ class ImageCache
      *
      * @var array
      */
-    public $calls = array();
+    public $calls = [];
 
     /**
      * Additional properties included in checksum
      *
      * @var array
      */
-    public $properties = array();
+    public $properties = [];
 
     /**
      * Processed Image
@@ -56,7 +59,7 @@ class ImageCache
      */
     public function __construct(ImageManager $manager = null, Cache $cache = null)
     {
-        $this->manager = $manager ? $manager : new ImageManager;
+        $this->manager = $manager ? $manager : new ImageManager();
 
         if (is_null($cache)) {
             // get laravel app
@@ -76,13 +79,13 @@ class ImageCache
                 if (isset($manager->config['cache']['path'])) {
                     $path = $manager->config['cache']['path'];
                 } else {
-                    $path = __DIR__.'/../../../storage/cache';
+                    $path = __DIR__ . '/../../../storage/cache';
                 }
 
                 // create new default cache
-                $filesystem = new \Illuminate\Filesystem\Filesystem;
-                $storage = new \Illuminate\Cache\FileStore($filesystem, $path);
-                $this->cache = new \Illuminate\Cache\Repository($storage);
+                $filesystem = new Filesystem();
+                $storage = new FileStore($filesystem, $path);
+                $this->cache = new Repository($storage);
             }
         } else {
             $this->cache = $cache;
@@ -117,7 +120,7 @@ class ImageCache
         }
 
         // register make call
-        $this->__call('make', array($data));
+        $this->__call('make', [$data]);
 
         return $this;
     }
@@ -159,7 +162,7 @@ class ImageCache
         $properties = serialize($this->properties);
         $calls = serialize($this->getSanitizedCalls());
 
-        return md5($properties.$calls);
+        return md5($properties . $calls);
     }
 
     /**
@@ -171,7 +174,10 @@ class ImageCache
      */
     protected function registerCall($name, $arguments)
     {
-        $this->calls[] = array('name' => $name, 'arguments' => $arguments);
+        $this->calls[] = [
+            'name' => $name,
+            'arguments' => $arguments,
+        ];
     }
 
     /**
@@ -181,7 +187,7 @@ class ImageCache
      */
     protected function clearCalls()
     {
-        $this->calls = array();
+        $this->calls = [];
     }
 
     /**
@@ -191,7 +197,7 @@ class ImageCache
      */
     protected function clearProperties()
     {
-        $this->properties = array();
+        $this->properties = [];
     }
 
     /**
@@ -201,7 +207,7 @@ class ImageCache
      */
     protected function getCalls()
     {
-        return count($this->calls) ? $this->calls : array();
+        return count($this->calls) ? $this->calls : [];
     }
 
     /**
@@ -215,7 +221,7 @@ class ImageCache
 
         foreach ($calls as $i => $call) {
             foreach ($call['arguments'] as $j => $argument) {
-                if (is_a($argument, 'Closure')) {
+                if (is_a($argument, Closure::class)) {
                     $calls[$i]['arguments'][$j] = $this->getClosureHash($argument);
                 }
             }
@@ -243,7 +249,13 @@ class ImageCache
      */
     protected function processCall($call)
     {
-        $this->image = call_user_func_array(array($this->image, $call['name']), $call['arguments']);
+        $this->image = call_user_func_array(
+            [
+                $this->image,
+                $call['name']
+            ],
+            $call['arguments']
+        );
     }
 
     /**
@@ -293,8 +305,7 @@ class ImageCache
             // transform into image-object
             if ($returnObj) {
                 $image = $this->manager->make($cachedImageData);
-                $cachedImage = new CachedImage;
-                return $cachedImage->setFromOriginal($image, $key);
+                return (new CachedImage())->setFromOriginal($image, $key);
             }
 
             // return raw data
