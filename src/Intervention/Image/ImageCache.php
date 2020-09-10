@@ -2,8 +2,9 @@
 
 namespace Intervention\Image;
 
-use Exception;
+use Closure;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Cache\Repository as Cache;
 
 class ImageCache
@@ -215,7 +216,7 @@ class ImageCache
         foreach ($calls as $i => $call) {
             foreach ($call['arguments'] as $j => $argument) {
                 if (is_a($argument, 'Closure')) {
-                    $calls[$i]['arguments'][$j] = $this->buildSerializableClosure($argument);
+                    $calls[$i]['arguments'][$j] = $this->getClosureHash($argument);
                 }
             }
         }
@@ -224,20 +225,14 @@ class ImageCache
     }
 
     /**
-     * Build SerializableClosure from Closure
+     * Build hash from closure
      *
      * @param  Closure $closure
-     * @return Jeremeamia\SuperClosure\SerializableClosure|SuperClosure\SerializableClosure
+     * @return string
      */
-    protected function buildSerializableClosure(\Closure $closure)
+    protected function getClosureHash(Closure $closure)
     {
-        switch (true) {
-            case class_exists('SuperClosure\\SerializableClosure'):
-                return new \SuperClosure\SerializableClosure($closure);
-
-            default:
-                return new \Jeremeamia\SuperClosure\SerializableClosure($closure);
-        }
+        return (new HashableClosure($closure))->getHash();
     }
 
     /**
