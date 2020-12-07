@@ -63,6 +63,19 @@ $img = Image::cache(function($image) {
 }, 10, true);
 ```
 
+## Server configuration
+
+If you have Static Resources caching enabled on Nginx please add your cache directory ({route} in config) to static resources handler exclusion:
+
+```
+# where "cache" is {route}
+location ~* ^\/(?!cache).*\.(?:jpg|jpeg|gif|png|ico|cur|gz|svg|svgz|mp4|ogg|ogv|webm|htc|webp|woff|woff2)$ {
+  expires max;
+  access_log off;
+  add_header Cache-Control "public";
+}
+```
+
 ## License
 
 Intervention Imagecache Class is licensed under the [MIT License](http://opensource.org/licenses/MIT).
