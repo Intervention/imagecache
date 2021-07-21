@@ -67,3 +67,4 @@ $img = Image::cache(function($image) {
 ## License
 
 Intervention Imagecache Class is licensed under the [MIT License](http://opensource.org/licenses/MIT).
+
