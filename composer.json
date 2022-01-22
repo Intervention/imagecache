@@ -1,7 +1,7 @@
 {
     "name": "intervention/imagecache",
     "description": "Caching extension for the Intervention Image Class",
-    "homepage": "http://image.intervention.io",
+    "homepage": "https://image.intervention.io",
     "keywords": [
         "image",
         "gd",
@@ -13,8 +13,8 @@
     "authors": [
         {
             "name": "Oliver Vogel",
-            "email": "oliver@olivervogel.com",
-            "homepage": "http://olivervogel.com/"
+            "email": "oliver@intervention.io",
+            "homepage": "http://intervention.io/"
         }
     ],
     "require": {
