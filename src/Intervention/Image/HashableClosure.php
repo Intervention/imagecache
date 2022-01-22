@@ -33,7 +33,7 @@ class HashableClosure
     {
         $closure = new SerializableClosure($closure);
         $closure->removeSecurityProvider();
-        
+
         $this->closure = $closure;
 
         return $this;

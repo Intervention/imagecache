@@ -182,7 +182,6 @@ class ImageCacheTest extends TestCase
               ->with($this->equalTo($checksum))
               ->willReturn($imagedata);
 
-        
         $img = new ImageCache($manager, $cache);
         $img->make('foo/bar.jpg');
         $img->resize(100, 150);
@@ -203,7 +202,7 @@ class ImageCacheTest extends TestCase
                 ->method('make')
                 ->with($this->equalTo($imagedata))
                 ->willReturn($image);
-        
+
         $cache = $this->createMock(Repository::class);
         $cache->expects($this->once())
               ->method('get')
@@ -218,7 +217,6 @@ class ImageCacheTest extends TestCase
         $this->assertInstanceOf(Image::class, $result);
     }
 
-    
     public function testGetImageNotFromCache()
     {
         $lifetime = 12;
@@ -243,7 +241,7 @@ class ImageCacheTest extends TestCase
                 ->method('make')
                 ->with($this->equalTo('foo/bar.jpg'))
                 ->willReturn($image);
-        
+
         $cache = $this->createMock(Repository::class);
         $cache->expects($this->once())
               ->method('get')
@@ -261,7 +259,6 @@ class ImageCacheTest extends TestCase
 
         $this->assertEquals($imagedata, $result);
     }
-    
 
     public function testGetImageNotFromCacheAsObject()
     {
@@ -287,7 +284,7 @@ class ImageCacheTest extends TestCase
                 ->method('make')
                 ->with($this->equalTo('foo/bar.jpg'))
                 ->willReturn($image);
-        
+
         $cache = $this->createMock(Repository::class);
         $cache->expects($this->once())
               ->method('get')
