@@ -48,6 +48,9 @@ class ImageCacheController extends BaseController
         $manager = new ImageManager(Config::get('image'));
         $content = $manager->cache(function ($image) use ($template, $path) {
 
+            // add querystring as cache parameter
+            $image->setProperty('urlparameters', request()->getQueryString());
+            
             if ($template instanceof Closure) {
                 // build from closure callback template
                 $template($image->make($path));
