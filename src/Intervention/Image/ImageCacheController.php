@@ -20,6 +20,9 @@ class ImageCacheController extends BaseController
      */
     public function getResponse($template, $filename)
     {
+        // Ensure that output buffering is off:
+        ob_end_clean();
+        
         switch (strtolower($template)) {
             case 'original':
                 return $this->getOriginal($filename);
