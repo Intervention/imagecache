@@ -20,8 +20,8 @@
     "require": {
         "php": "~7.2|~8",
         "intervention/image": "~2.2",
-        "illuminate/cache": "^5.5|~6|~7|~8|~9",
-        "illuminate/filesystem": "^5.5|~6|~7|~8|~9",
+        "illuminate/cache": "^5.5|~6|~7|~8|~9|~10",
+        "illuminate/filesystem": "^5.5|~6|~7|~8|~9|~10",
         "nesbot/carbon": "^2.39",
         "opis/closure": "^3.5"
     },
