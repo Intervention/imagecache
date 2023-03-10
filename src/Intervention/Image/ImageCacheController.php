@@ -5,10 +5,9 @@ namespace Intervention\Image;
 use Closure;
 use Config;
 use Intervention\Image\ImageManager;
-use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Http\Response as IlluminateResponse;
 
-class ImageCacheController extends BaseController
+class ImageCacheController
 {
     /**
      * Get HTTP response of either original image file or
@@ -45,7 +44,7 @@ class ImageCacheController extends BaseController
         $path = $this->getImagePath($filename);
 
         // image manipulation based on callback
-        $manager = new ImageManager(Config::get('image'));
+        $manager = new ImageManager(config('image'));
         $content = $manager->cache(function ($image) use ($template, $path) {
 
             if ($template instanceof Closure) {
