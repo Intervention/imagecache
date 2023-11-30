@@ -3,7 +3,7 @@
 namespace Intervention\Image\Test;
 
 use Intervention\Image\HashableClosure;
-use Opis\Closure\SerializableClosure;
+use Laravel\SerializableClosure\UnsignedSerializableClosure;
 use PHPUnit\Framework\TestCase;
 
 class HashableClosureTest extends TestCase
@@ -28,7 +28,7 @@ class HashableClosureTest extends TestCase
         });
 
         $this->assertInstanceOf(HashableClosure::class, $result);
-        $this->assertInstanceOf(SerializableClosure::class, $hashable->getClosure());
+        $this->assertInstanceOf(UnsignedSerializableClosure::class, $hashable->getClosure());
     }
 
     public function testGetHash()
