@@ -3,14 +3,14 @@
 namespace Intervention\Image;
 
 use Closure;
-use Opis\Closure\SerializableClosure;
+use Laravel\SerializableClosure\UnsignedSerializableClosure;
 
 class HashableClosure
 {
     /**
      * Original closure
      *
-     * @var \Opis\Closure\SerializableClosure
+     * @var \Laravel\SerializableClosure\UnsignedSerializableClosure
      */
     protected $closure;
 
@@ -31,8 +31,7 @@ class HashableClosure
      */
     public function setClosure(Closure $closure)
     {
-        $closure = new SerializableClosure($closure);
-        $closure->removeSecurityProvider();
+        $closure = new UnsignedSerializableClosure($closure);
 
         $this->closure = $closure;
 
@@ -42,7 +41,7 @@ class HashableClosure
     /**
      * Get current closure
      *
-     * @return \Opis\Closure\SerializableClosure
+     * @return \Laravel\SerializableClosure\UnsignedSerializableClosure
      */
     public function getClosure()
     {
@@ -52,7 +51,7 @@ class HashableClosure
     /**
      * Get hash of current closure
      *
-     * This method uses "opis/closure" to serialize the closure. "opis/closure",
+     * This method uses "laravel/serializable-closure" to serialize the closure. "laravel/serializable-closure",
      * however, adds a identifier by "spl_object_hash" to each serialize
      * call, making it impossible to create unique hashes. This method
      * removes this identifier and builds the hash afterwards.
@@ -61,7 +60,8 @@ class HashableClosure
      */
     public function getHash()
     {
-        $data = unserialize($this->closure->serialize());
+        $serializable = $this->closure->__serialize();
+        $data = $serializable['serializable']->__serialize();
 
         unset($data['self']); // unset identifier added by spl_object_hash
 

@@ -4,6 +4,9 @@ namespace Intervention\Image;
 
 class CachedImage extends Image
 {
+
+    public $cachekey;
+
     public function setFromOriginal(Image $original, $cachekey)
     {
         $this->driver = $original->driver;
